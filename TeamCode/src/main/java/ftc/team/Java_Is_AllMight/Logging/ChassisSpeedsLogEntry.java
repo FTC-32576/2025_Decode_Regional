@@ -1,6 +1,4 @@
-package ftc.team.java_is_allmight.Logging;
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+package ftc.team.Java_Is_AllMight.Logging;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
