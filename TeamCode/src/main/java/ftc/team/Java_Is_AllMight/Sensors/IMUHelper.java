@@ -1,4 +1,4 @@
-package ftc.team.java_is_allmight.Sensors;
+package ftc.team.Java_Is_AllMight.Sensors;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
