@@ -7,6 +7,7 @@
 
 This repository contains the official software for **FTC Team #32576 — All Might**, developed for the current **FIRST Tech Challenge (FTC)** season.
 Our project is based on the **NGC — Next Generation Codebase**, an internal architecture model designed by the team to keep our codebase clean, scalable, and easy to maintain across multiple seasons.
+
 ---
 
 ## 🧩 What Is NGC (Next Generation Codebase)?
