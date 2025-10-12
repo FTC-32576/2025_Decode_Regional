@@ -342,7 +342,7 @@ public class LimelightHelper {
      * @param telemetry        Telemetry para debug
      * @return true se alcançou a distância
      */
-    public boolean moveToClosestFiducial(double desiredDistance, double maxPower, Telemetry telemetry){
+    public boolean moveToFiducialByIdTank(int targetID, double desiredDistance, double maxPower, Telemetry telemetry){
 
         if(leftMotor == null || rightMotor == null || distancePID == null || yawPID == null) return false;
 
@@ -350,13 +350,13 @@ public class LimelightHelper {
         if(fiducials == null || fiducials.isEmpty()) return false;
 
         // Pega a fiducial mais próxima
-        LLResultTypes.FiducialResult target = fiducials.get(0);
-        double minDist = getDistanceToFiducial(target);
+
+        LLResultTypes.FiducialResult target = null;
         for(LLResultTypes.FiducialResult f : fiducials){
-            double d = getDistanceToFiducial(f);
-            if(d < minDist){
-                minDist = d;
+            if(f.getFiducialId() == targetID){
                 target = f;
+
+                break;
             }
         }
 
@@ -373,8 +373,6 @@ public class LimelightHelper {
 
         // Comando PID para distância
         double forwardPower = distancePID.calculate(desiredDistance,distanceError);
-
-        // Limita potência
         forwardPower = Math.max(-maxPower, Math.min(maxPower, forwardPower));
 
         // Correção de yaw
@@ -405,6 +403,90 @@ public class LimelightHelper {
 
         return false;
     }
+
+    public boolean moveToFiducialByIdMecanum(int targetID,DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight, double desiredDistance, double maxPower, Telemetry telemetry){
+
+        if(frontLeft == null || frontRight == null || backLeft == null || backRight == null || distancePID == null || yawPID == null)
+            return false;
+
+        List<LLResultTypes.FiducialResult> fiducials = getFiducials();
+        if(fiducials == null || fiducials.isEmpty()) return false;
+
+        // Procura fiducial com o ID desejado
+        LLResultTypes.FiducialResult target = null;
+        for(LLResultTypes.FiducialResult f : fiducials){
+            if(f.getFiducialId() == targetID){
+                target = f;
+                break;
+            }
+        }
+        if(target == null) return false;
+
+        // Distância e ângulo para a fiducial
+        double distance = getDistanceToFiducial(target);
+        double distanceError = distance - desiredDistance;
+        double yawToTag = getYawToFiducial(target);
+
+        // Se dentro da tolerância, parar motores
+        if(Math.abs(distanceError) < 0.05){
+            frontLeft.setPower(0);
+            frontRight.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
+            return true;
+        }
+
+        // PID para distância
+        double forwardPower = distancePID.calculate(desiredDistance, distanceError);
+        forwardPower = clamp(forwardPower, -maxPower, maxPower);
+
+        // PID para yaw
+        double yawCorrection = yawPID.calculate(0, yawToTag);
+
+        // Movimentação lateral (strafe) baseada no ângulo da fiducial
+        // Transformamos o vetor polar (distance, yawToTag) em componentes X e Y
+        double strafePower = forwardPower * Math.sin(Math.toRadians(yawToTag));
+        double forwardComponent = forwardPower * Math.cos(Math.toRadians(yawToTag));
+
+        // Ajuste de cada motor para mecanum
+        double fl = forwardComponent + strafePower + yawCorrection;
+        double fr = forwardComponent - strafePower - yawCorrection;
+        double bl = forwardComponent - strafePower + yawCorrection;
+        double br = forwardComponent + strafePower - yawCorrection;
+
+        // Limita cada motor
+        fl = clamp(fl, -maxPower, maxPower);
+        fr = clamp(fr, -maxPower, maxPower);
+        bl = clamp(bl, -maxPower, maxPower);
+        br = clamp(br, -maxPower, maxPower);
+
+        // Define potência
+        frontLeft.setPower(fl);
+        frontRight.setPower(fr);
+        backLeft.setPower(bl);
+        backRight.setPower(br);
+
+        // Telemetria
+        if(telemetry != null){
+            telemetry.addData("Fiducial ID", target.getFiducialId());
+            telemetry.addData("Distance Error", distanceError);
+            telemetry.addData("Forward", forwardComponent);
+            telemetry.addData("Strafe", strafePower);
+            telemetry.addData("Yaw Correction", yawCorrection);
+            telemetry.addData("FL", fl);
+            telemetry.addData("FR", fr);
+            telemetry.addData("BL", bl);
+            telemetry.addData("BR", br);
+            telemetry.update();
+        }
+
+        return false;
+    }
+
+    private double clamp(double value, double min, double max){
+        return Math.max(min, Math.min(max, value));
+    }
+
 
 
 }
