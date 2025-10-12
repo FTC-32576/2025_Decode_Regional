@@ -3,7 +3,7 @@
 [![English](https://img.shields.io/badge/lang-en-red.svg)](readme.md)
 [![Português](https://img.shields.io/badge/lang-pt--br-green.svg)](readme.pt.md)
 
-# Java Is AllMight
+# Java Is All Might
 
 Este repositório contém o código oficial da **equipe FTC All Might #32576** para a temporada atual da FIRST Tech Challenge (FTC).
 Nosso projeto segue o **NGC — Next Generation Codebase**, um modelo de organização desenvolvido pela própria equipe para manter o código limpo, escalável e sustentável entre temporadas.

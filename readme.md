@@ -3,7 +3,7 @@
 [![English](https://img.shields.io/badge/lang-en-red.svg)](readme.md)
 [![Português](https://img.shields.io/badge/lang-pt--br-green.svg)](readme.pt.md)
 
-# Java Is AllMight
+# Java Is All Might
 
 This repository contains the official software for **FTC Team #32576 — All Might**, developed for the current **FIRST Tech Challenge (FTC)** season.
 Our project is based on the **NGC — Next Generation Codebase**, an internal architecture model designed by the team to keep our codebase clean, scalable, and easy to maintain across multiple seasons.
