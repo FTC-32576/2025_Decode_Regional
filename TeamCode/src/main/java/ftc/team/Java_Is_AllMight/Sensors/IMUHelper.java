@@ -20,10 +20,10 @@ public class IMUHelper {
 
 
     /**
-    * @param hardwareMap HardwareMap do robô
-     * @param imuName nome do IMU configurado na Driver Station
-     * @param usbFacingDirection Direção da USB do Control Hub
-     * @param logoFacingDirection Direção da Logo do Control Hub
+     * @param hardwareMap Robot HardwareMap
+     * @param imuName Name of the IMU configured on the Driver Station
+     * @param usbFacingDirection USB FacingDirection of the Control Hub
+     * @param logoFacingDirection Logo FacingDirection of the Control Hub
      */
     public IMUHelper(HardwareMap hardwareMap, String imuName,
                      RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection,
@@ -40,7 +40,7 @@ public class IMUHelper {
     }
 
     /**
-     * Normaliza um ângulo para ficar entre -180 e 180 graus
+     * Normalizes an angle to be between -180 and 180 degrees
      */
     public double normalizeAngle(double angle){
         angle %= 360;

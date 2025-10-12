@@ -51,13 +51,13 @@ public class LimelightDriveController {
     }
 
     /**
-     * Move o robô até a posição X,Y no campo
+     * Moves the robot to the X,Y position in the field
      *
-     * @param xTarget alvo X
-     * @param yTarget alvo Y
-     * @param dtSeconds intervalo desde o último loop
-     * @param telemetry Telemetria opcional
-     * @return true se chegou próximo o suficiente
+     * @param xTarget target X
+     * @param yTarget target Y
+     * @param dtSeconds interval since the last loop
+     * @param telemetry Optional telemetry
+     * @return true if close enough
      */
     public boolean moveToPosition(double xTarget, double yTarget, double dtSeconds, Telemetry telemetry) {
         double[] powers = limelightHelper.calculateMovementToPosition(xTarget, yTarget, dtSeconds);
