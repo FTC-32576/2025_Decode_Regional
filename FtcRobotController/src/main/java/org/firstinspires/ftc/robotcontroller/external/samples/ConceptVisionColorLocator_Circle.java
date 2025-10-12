@@ -61,7 +61,7 @@ import java.util.List;
  * The original Blob contour can also be added to the preview.
  * This is helpful when configuring the ColorBlobLocatorProcessor parameters.
  *
- * Tip:  Connect an HDMI monitor to the Control Hub to view the Color Location process in real-time.
+ * Tip:  Connect an HDMI monitor to the Config Hub to view the Color Location process in real-time.
  *       Or use a screen copy utility like ScrCpy.exe to view the video remotely.
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.

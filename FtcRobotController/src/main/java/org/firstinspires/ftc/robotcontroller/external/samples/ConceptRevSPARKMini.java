@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.Range;
 /*
  * This OpMode demonstrates a POV Drive system, with commented-out code for a Tank Drive system,
  * for a two wheeled robot using two REV SPARKminis.
- * To use this example, connect two REV SPARKminis into servo ports on the Control Hub. On the
+ * To use this example, connect two REV SPARKminis into servo ports on the Config Hub. On the
  * robot configuration, use the drop down list under 'Servos' to select 'REV SPARKmini Controller'
  * and name them 'left_drive' and 'right_drive'.
  *

@@ -3,9 +3,6 @@ package ftc.team.allmight.plusultra.teamcode.auto;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import ftc.team.Java_Is_AllMight.Control.PIDConfig;
 import ftc.team.Java_Is_AllMight.Sensors.LimelightHelper;
 import ftc.team.allmight.plusultra.teamcode.utils.AprilTagPatternUtil;
 

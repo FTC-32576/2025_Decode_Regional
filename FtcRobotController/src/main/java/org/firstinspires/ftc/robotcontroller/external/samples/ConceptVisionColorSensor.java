@@ -52,7 +52,7 @@ import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
  * To aid the user, a colored rectangle is drawn on the camera preview to show the RegionOfInterest,
  * The Predominant Color is used to paint the rectangle border, so the user can visualize the color.
  *
- * Tip:  Connect an HDMI monitor to the Control Hub to view the Color Sensor process in real-time.
+ * Tip:  Connect an HDMI monitor to the Config Hub to view the Color Sensor process in real-time.
  *       Or use a screen copy utility like ScrCpy.exe to view the video remotely.
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.

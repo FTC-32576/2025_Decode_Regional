@@ -50,9 +50,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  *  The code REQUIRES that you have encoders on the drive motors, otherwise you should use: RobotAutoDriveByTime;
  *
  *  This code uses the Universal IMU interface so it will work with either the BNO055, or BHI260 IMU.
- *  To run as written, the Control/Expansion hub should be mounted horizontally on a flat part of the robot chassis.
+ *  To run as written, the Config/Expansion hub should be mounted horizontally on a flat part of the robot chassis.
  *  The REV Logo should be facing UP, and the USB port should be facing forward.
- *  If this is not the configuration of your REV Control Hub, then the code should be modified to reflect the correct orientation.
+ *  If this is not the configuration of your REV Config Hub, then the code should be modified to reflect the correct orientation.
  *
  *  This sample requires that the drive Motors have been configured with names : left_drive and right_drive.
  *  It also requires that a positive power command moves both motors forward, and causes the encoders to count UP.
@@ -73,7 +73,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  *  This is consistent with the FTC field coordinate conventions set out in the document:
  *  https://ftc-docs.firstinspires.org/field-coordinate-system
  *
- *  Control Approach.
+ *  Config Approach.
  *
  *  To reach, or maintain a required heading, this code implements a basic Proportional Controller where:
  *
@@ -95,7 +95,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     private DcMotor         leftDrive   = null;
     private DcMotor         rightDrive  = null;
-    private IMU             imu         = null;      // Control/Expansion Hub IMU
+    private IMU             imu         = null;      // Config/Expansion Hub IMU
 
     private double          headingError  = 0;
 

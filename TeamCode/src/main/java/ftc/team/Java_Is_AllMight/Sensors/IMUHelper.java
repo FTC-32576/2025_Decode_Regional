@@ -22,8 +22,8 @@ public class IMUHelper {
     /**
      * @param hardwareMap Robot HardwareMap
      * @param imuName Name of the IMU configured on the Driver Station
-     * @param usbFacingDirection USB FacingDirection of the Control Hub
-     * @param logoFacingDirection Logo FacingDirection of the Control Hub
+     * @param usbFacingDirection USB FacingDirection of the Config Hub
+     * @param logoFacingDirection Logo FacingDirection of the Config Hub
      */
     public IMUHelper(HardwareMap hardwareMap, String imuName,
                      RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection,

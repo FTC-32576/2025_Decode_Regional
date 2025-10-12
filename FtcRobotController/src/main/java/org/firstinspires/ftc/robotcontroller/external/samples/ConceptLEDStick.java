@@ -56,7 +56,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  *
  * You can buy this product here:  https://www.sparkfun.com/products/18354
- * Don't forget to also buy this to make it easy to connect to your Control or Expansion Hub:
+ * Don't forget to also buy this to make it easy to connect to your Config or Expansion Hub:
  * https://www.sparkfun.com/products/25596
  */
 @TeleOp(name = "Concept: LED Stick", group = "Concept")

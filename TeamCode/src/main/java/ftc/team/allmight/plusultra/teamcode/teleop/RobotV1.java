@@ -16,17 +16,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class RobotV1 extends OpMode {
 
-    private DcMotor shooterMotor, leftMotor, rightMotor;
+    private DcMotor leftMotor, rightMotor;
     private CustomChassisSpeedsLogger chassisLogger;
     private IMUHelper imu;
 
-    private final RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
-    private final RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
-
     private double inputY, inputX;
-    private YawPitchRollAngles robotOrientation;
-
-    double Heading, Pitch,Roll;
 
     private ShooterSubsystem shooterSubsystem;
     private ShooterCommand shooterCommand;
@@ -34,67 +28,67 @@ public class RobotV1 extends OpMode {
     @Override
     public void init() {
         chassisLogger = new CustomChassisSpeedsLogger("ChassiLogger", telemetry);
-        leftMotor = getHardware(DcMotor.class, "motorEsquerdo");
-        rightMotor = getHardware(DcMotor.class, "motorDireito");
-        shooterSubsystem = new ShooterSubsystem(hardwareMap, "shooter");
+        leftMotor = hardwareMap.get(DcMotor.class, "motorEsquerdo");
+        rightMotor = hardwareMap.get(DcMotor.class, "motorDireito");
+
+        // Shooter
+        shooterSubsystem = new ShooterSubsystem(hardwareMap, "shooter", telemetry);
         shooterCommand = new ShooterCommand(shooterSubsystem);
 
+        // IMU
         imu = new IMUHelper(hardwareMap, "imu", RevHubOrientationOnRobot.UsbFacingDirection.UP, RevHubOrientationOnRobot.LogoFacingDirection.FORWARD);
-
-        Heading = imu.getYaw();
-        Pitch = imu.getPitch();
-        Roll = imu.getRoll();
-
-        telemetry.addData("Atributos do IMU", "Yaw: %s, Pitch %s, Roll %s", Heading, Pitch, Roll);
-        telemetry.update();
 
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
     }
 
     @Override
     public void loop() {
+        // ---------------------- Movimentação ----------------------
+        inputY = -gamepad1.left_stick_y; //Frente tras
+        inputX = gamepad1.right_stick_x; // Giro
 
-        inputY = -gamepad1.left_stick_y;
-        inputX = gamepad1.right_stick_x;
+        double leftPower = Range.clip(inputY + inputX, -1.0, 1.0);
+        double rightPower = Range.clip(inputY - inputX, -1.0, 1.0);
 
-        double leftPower, rightPower;
+        moveTank(leftPower, rightPower);
 
-        leftPower = Range.clip(inputY + inputX, -1.0, 1.0);
-        rightPower = Range.clip(inputY - inputX, -1.0, 1.0);
-
-        this.moveTank(leftPower, rightPower);
-
-
-        if(gamepad1.right_bumper){
-            shooterCommand.execute(1);
-        }
-
-        telemetry.addData("Atributos do IMU", "Yaw: %s, Pitch %s, Roll %s", imu.getYaw(), imu.getPitch(), imu.getRoll());
-        telemetry.update();
-
-    }
-
-    public <T> T getHardware(Class<T> tipoDeHardware, String nome){
-        return hardwareMap.get(tipoDeHardware, nome);
-
-    }
-
-    public void moveTank(double leftPower, double rightPower){
-        leftMotor.setPower(leftPower);
-        rightMotor.setPower(rightPower);
-        ChassisSpeed currentsSpeeds = new ChassisSpeed(inputY, 0, inputY);
-
+        // ---------------------- Log do Chassi ----------------------
+        ChassisSpeed currentsSpeeds = new ChassisSpeed(inputY, 0, inputX);
         chassisLogger.append(currentsSpeeds);
 
-        telemetry.addData("Velocidade dos Motores", "Velocidade Esquerda: %s | Velocidade Direita %s", leftPower, rightPower);
+        // ---------------------- Shooter ----------------------
+
+        if (gamepad1.right_bumper) {
+            shooterCommand.execute(1.0);
+        }
+//        } else if (gamepad1.right_trigger > 0.1) {
+//            // RPM alvo proporcional ao gatilho
+//            double targetRPM = 3500 * gamepad1.right_trigger; // exemplo: 0-3500 RPM
+//            shooterCommand.executeRPM(targetRPM);
+//        }
+        else {
+            shooterCommand.end();
+        }
+
+        // Atualiza PID a cada loop
+        shooterCommand.update();
+
+        // ---------------------- Telemetria ----------------------
+        telemetry.addData("Shooter RPM", shooterSubsystem.getShooterRPM());
+        telemetry.addData("Shooter Setpoint", shooterSubsystem.shooterTarget);
+        telemetry.addData("Shooter AtSetpoint", shooterSubsystem.atSetpoint());
+        telemetry.addData("IMU Yaw/Pitch/Roll", "%f / %f / %f", imu.getYaw(), imu.getPitch(), imu.getRoll());
         telemetry.update();
     }
 
-}
+    public void moveTank(double leftPower, double rightPower) {
+        leftMotor.setPower(leftPower);
+        rightMotor.setPower(rightPower);
 
+        ChassisSpeed currentsSpeeds = new ChassisSpeed(inputY, 0, inputX);
+        chassisLogger.append(currentsSpeeds);
+
+        telemetry.addData("Velocidade dos Motores", "Esquerda: %.2f | Direita: %.2f", leftPower, rightPower);
+    }
+}

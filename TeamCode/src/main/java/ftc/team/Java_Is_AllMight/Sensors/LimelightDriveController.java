@@ -6,11 +6,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
-import ftc.team.Java_Is_AllMight.Control.PIDConfig;
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 
 public class LimelightDriveController {
 
-    private final LimelightHelper limelightHelper;
+    public final LimelightHelper limelightHelper;
     private final DcMotor leftMotor;
     private final DcMotor rightMotor;
 

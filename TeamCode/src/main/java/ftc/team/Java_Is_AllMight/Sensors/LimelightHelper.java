@@ -13,8 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
-import ftc.team.Java_Is_AllMight.Control.PIDConfig;
-import ftc.team.Java_Is_AllMight.Control.PIDController;
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
+import ftc.team.Java_Is_AllMight.Config.PIDController;
 
 
 public class LimelightHelper {
@@ -245,7 +245,6 @@ public class LimelightHelper {
     public boolean updatePythonInputs(double[] inputs) {
         return limelight.updatePythonInputs(inputs);
     }
-
 
     // ==========================
     // PIPELINE METHODS
