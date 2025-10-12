@@ -1,0 +1,53 @@
+{
+  "version": "1.0",
+  "waypoints": [
+    {
+      "x": 0.907222444152832,
+      "y": 2.7389762546539305,
+      "heading": 0,
+      "prevControlLength": 0.5,
+      "nextControlLength": 0.013724999999999987,
+      "velocity": 0,
+      "locked": false
+    },
+    {
+      "x": 0.8751974441528321,
+      "y": 1.4396762546539306,
+      "heading": -24.139448609438237,
+      "prevControlLength": 0.10158148514862339,
+      "nextControlLength": 1.353620272870128,
+      "velocity": 0,
+      "locked": false
+    },
+    {
+      "x": 2.320897444152832,
+      "y": 2.0207012546539307,
+      "heading": 120.46554491946011,
+      "prevControlLength": 0.09023310437417092,
+      "nextControlLength": 0.5,
+      "velocity": 0,
+      "locked": false
+    }
+  ],
+  "startState": {
+    "velocity": 0,
+    "rotation": 0
+  },
+  "endState": {
+    "velocity": 0,
+    "rotation": 0
+  },
+  "globalConstraints": {
+    "maxVelocity": 3,
+    "maxAcceleration": 3,
+    "maxAngularVelocity": 540,
+    "maxAngularAcceleration": 720,
+    "nominalVoltage": 12,
+    "useDefaultConstraints": true,
+    "unlimited": false
+  },
+  "constraintZones": [],
+  "eventMarkers": [],
+  "rotationTargets": [],
+  "pointTowardsZones": []
+}
