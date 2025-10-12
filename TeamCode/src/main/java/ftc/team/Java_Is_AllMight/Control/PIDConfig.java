@@ -1,4 +1,4 @@
-package ftc.team.java_is_allmight.Control;
+package ftc.team.Java_Is_AllMight.Control;
 
 public class PIDConfig {
 

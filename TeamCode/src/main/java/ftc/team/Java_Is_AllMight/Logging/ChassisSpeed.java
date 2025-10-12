@@ -1,12 +1,4 @@
-package ftc.team.java_is_allmight.Logging;
-
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+package ftc.team.Java_Is_AllMight.Logging;
 
 public class ChassisSpeed {
     public double vx, vy, omega;

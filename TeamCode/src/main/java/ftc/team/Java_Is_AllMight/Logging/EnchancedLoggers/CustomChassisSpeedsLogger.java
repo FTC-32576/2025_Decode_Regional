@@ -1,7 +1,7 @@
-package ftc.team.java_is_allmight.Logging.EnchancedLoggers;
+package ftc.team.Java_Is_AllMight.Logging.EnchancedLoggers;
 
-import ftc.team.java_is_allmight.Logging.ChassisSpeed;
-import ftc.team.java_is_allmight.Logging.ChassisSpeedsLogEntry;
+import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
+import ftc.team.Java_Is_AllMight.Logging.ChassisSpeedsLogEntry;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class CustomChassisSpeedsLogger extends ChassisSpeedsLogEntry {
