@@ -1,157 +1,163 @@
+
+**🌎 Available languages:**
+[![English](https://img.shields.io/badge/lang-en-red.svg)](readme.md)
+[![Português](https://img.shields.io/badge/lang-pt--br-green.svg)](readme.pt.md)
+
 # Java Is AllMight
 
-Este repositório contém o código oficial da **equipe FTC All Might #32576** para a temporada atual da FIRST Tech Challenge (FTC).
-Nosso projeto segue o **NGC — Next Generation Codebase**, um modelo de organização desenvolvido pela própria equipe para manter o código limpo, escalável e sustentável entre temporadas.
+This repository contains the official software for **FTC Team #32576 — All Might**, developed for the current **FIRST Tech Challenge (FTC)** season.
+Our project is based on the **NGC — Next Generation Codebase**, an internal architecture model designed by the team to keep our codebase clean, scalable, and easy to maintain across multiple seasons.
+---
 
-## 🧩 O que é o NGC (Next Generation Codebase)
+## 🧩 What Is NGC (Next Generation Codebase)?
 
-O **NGC** é o padrão de arquitetura de código adotado pela All Might.
-Seu objetivo é separar o código **genérico (reutilizável)** do código **específico da temporada**, permitindo que a base seja reaproveitada com mínima refatoração.
+**NGC** defines the organizational and architectural standards used by Team All Might.
+It separates **generic, reusable code** from **season-specific logic**, allowing the same base to evolve with minimal refactoring from year to year.
 
-Essa separação garante:
+This structure enables:
 
-* 🔁 Reutilização entre temporadas (ex: classes de PID, IMU, Limelight);
-* 🧱 Modularidade — cada parte do robô é independente;
-* ⚙️ Manutenção mais fácil e segura;
-* 🚀 Padronização entre desenvolvedores e subequipes.
+* 🔁 **Code reusability** across seasons (e.g., PID, IMU, Limelight utilities)
+* 🧱 **Modularity** — every robot subsystem is self-contained
+* ⚙️ **Ease of maintenance** and debugging
+* 🚀 **Consistency** among developers and subteams
+
+> 💡 **NGC Insight:**
+> By isolating *Robot Code* from *Library Code*, strategy or hardware changes never affect the underlying control and sensor logic — making the entire system more sustainable and scalable.
 
 ---
 
-## ⚙️ Organização do Código
+## ⚙️ Code Organization
 
-| Categoria             | Robot Code                                                           | Library Code (TeamLib / Java_Is_AllMight)                   |
-| --------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------- |
-| **Função**            | Código específico da temporada atual | Código genérico, independente da temporada                  |
-| **Escopo**            | `ftc.team.allmight.plusultra.teamcode`                                       | `ftc.team.Java_Is_AllMight`                                         |
-| **Responsabilidade**  | Controlar o robô em campo, definir estratégias e rotinas autônomas   | Fornecer ferramentas, algoritmos e abstrações reutilizáveis |
-| **Qualidade** | Deve funcionar e estar bem testado                                   | 	Estilo de código consistente, legibilidade e documentação completa. Deve ser robusto e reutilizável.             |
-| **Ciclo de vida**     | Dura apenas a temporada atual                                        | Dura várias temporadas                                      |
-> 💡 **NGC Insight:** A separação Robot / Library garante que mudanças de estratégia ou hardware na temporada não impactem a lógica genérica de controle e sensores. Isso torna a base mais sustentável e escalável para futuras temporadas.
+| Category           | Robot Code (Season Specific)                                    | Library Code (TeamLib / Java_Is_AllMight)             |
+| ------------------ | --------------------------------------------------------------- | ----------------------------------------------------- |
+| **Purpose**        | Implements logic for the current season                         | Provides reusable tools, algorithms, and abstractions |
+| **Namespace**      | `ftc.team.allmight.plusultra.teamcode`                          | `ftc.team.Java_Is_AllMight`                           |
+| **Responsibility** | Controls the robot, defines strategies, and autonomous routines | Supplies reusable and robust code for multiple years  |
+| **Code Quality**   | Must be functional, tested, and competition-ready               | Must be clean, documented, and maintainable           |
+| **Lifecycle**      | Lasts for a single season                                       | Persists across multiple seasons                      |
 
 ---
 
-## 🗂️ Estrutura do Projeto
+## 🗂️ Project Structure
 
 ```text
 TeamCode/
 │
 ├── Java/ftc/team/
 │
-├── Java_Is_AllMight/                # TeamLib - Library Code (reutilizável)
-│   ├── Control/                     # PID, controle de movimento, navegação
-│   ├── Sensors/                     # IMUHelper, LimelightHelper e sensores
-│   ├── Logging/                     # Logs e diagnóstico do robô
+├── Java_Is_AllMight/                # TeamLib — Reusable Library Code
+│   ├── Control/                     # PID control, motion logic, navigation
+│   ├── Sensors/                     # IMUHelper, LimelightHelper, and sensors
+│   ├── Logging/                     # Logging and diagnostics
 │
-├── allmight/plusultra/teamcode/     # Robot Code (temporada atual)
-│   ├── TeleOp/                      # Modos manuais
-│   ├── Auto/                        # Modos autônomos
-│   └── Subsystems/                  # Sub-sistemas físicos (Drive, Shooter, Intake)
+├── allmight/plusultra/teamcode/     # Robot Code — Current Season
+│   ├── TeleOp/                      # Manual OpModes
+│   ├── Auto/                        # Autonomous OpModes
+│   └── Subsystems/                  # Robot subsystems (Drive, Shooter, Intake)
 │
-└── build.gradle                     # Configuração Android / FTC SDK
+└── build.gradle                     # FTC SDK / Gradle configuration
 ```
-
 
 ---
 
-## 🧠 TeamLib - Java_Is_AllMight
+## 🧠 TeamLib — Java_Is_AllMight
 
-A **TeamLib** é o coração da base de código.
-Ela contém tudo que é **independente de robô ou temporada**, formando uma biblioteca interna reutilizável.
+**TeamLib** is the backbone of the entire codebase.
+It contains all reusable and hardware-independent modules that can be shared across seasons.
 
-### Estrutura:
+### Structure Overview
 
 * **Control/**
 
-    * PIDConfig, PIDController;
+  * PIDConfig, PIDController
 * **Sensors/**
 
-    * `IMUHelper`, `LimelightHelper`;
+  * `IMUHelper`, `LimelightHelper`
 * **Logging/**
 
-    * Classes para coleta e exibição de dados, diagnósticos e debug;
+  * Classes for data capture, diagnostics, and debugging
 
-
-> 📘 **Missão da TeamLib:**
-> “Write once, use forever.” — Tudo o que for genérico deve nascer na TeamLib para ser herdado por futuras temporadas.
+> 📘 **TeamLib Mission:**
+> “Write once, use forever.”
+> Everything that can be generalized should live in TeamLib, ready to be extended or inherited in future seasons.
 
 ---
 
 ## ⚙️ Robot Code
 
-O **Robot Code** é onde o robô da temporada é realmente programado.
-Aqui entram as estratégias, rotinas automáticas e controles manuais.
+The **Robot Code** is where all season-specific logic lives — including OpModes, strategies, and subsystem management.
+
 ```
-          ┌────────────────────┐
-          │       OpMode       │
-          │  (TeleOp / Auto)   │
-          └─────────┬──────────┘
-                    │
-        ┌───────────▼───────────┐
-        │   Robot Subsystems    │
-        │ (Drive, Shooter, etc) │
-        └───────────┬───────────┘
-                    │
-        ┌───────────▼───────────────┐
-        │         TeamLib           │
-        │ Control | Sensors | Utils │
-        └───────────┬───────────────┘
-                    │
-        ┌───────────▼────────────┐
-        │      HardwareMap       │
-        │ Motores, Sensores, IMU │
-        └────────────────────────┘
+┌───────────────────┐
+│ OpMode            │
+│ (TeleOp / Auto)   │
+└───────────────────┘
+         │
+┌────────▼────────┐ 
+│ Robot Subsystems│ 
+│ (Drive, Shooter…)│ 
+└────────┬────────┘ 
+         │
+┌────────▼────────────┐ 
+│ TeamLib             │ 
+│ Control | Sensors    │
+└────────┬────────────┘
+         │
+┌────────▼────────────┐
+│ HardwareMap         │
+│ Motors, Sensors, IMU│
+└─────────────────────┘
 ```
 
-* **OpMode:** ponto de entrada da operação (manual ou autônoma).
-* **Subsystems:** recebem comandos e controlam motores e sensores.
-* **TeamLib:** fornece cálculos, helpers e lógica de controle.
-* **HardwareMap:** interface direta com o hardware do robô.
-> 🧩 Cada subsystem utiliza classes da TeamLib para realizar tarefas complexas (PID, Limelight, IMU), mantendo o código limpo e focado na lógica da partida.
----
+* **OpMode:** Entry point for operation (manual or autonomous).
+* **Subsystems:** Manage specific robot mechanisms.
+* **TeamLib:** Provides advanced helpers, control algorithms, and utilities.
+* **HardwareMap:** Direct interface between software and hardware.
 
-## 🔹 Continuous Integration (CI) & Qualidade
-
-A equipe All Might utiliza um pipeline de **CI/CD (Continuous Integration / Continuous Deployment)** para manter a estabilidade e qualidade do código.
-
-### 🔄 O que o pipeline faz:
-
-* **✅ Validação automática:**
-  Cada *push* ou *pull request* executa uma checagem automatizada no GitHub Actions, validando:
-
-    * Estrutura de pacotes;
-    * Compilação do projeto FTC (gradle build);
-    * Conformidade de estilo e documentação.
-
-* **🧪 Testes de unidade e integração:**
-  Rotinas da TeamLib (como PID, IMUHelper e LimelightHelper) possuem testes simulados para validar comportamento matemático e estrutural.
-
-* **📦 Deploy automatizado (opcional):**
-  Quando uma versão estável é marcada como *release*, o pipeline gera automaticamente um build `.apk` assinado e pronto para ser instalado no **Robot Controller (RC)**.
-
-> 💡 Essa abordagem garante que **nenhuma modificação chegue ao robô sem passar por verificação técnica**, aumentando a confiabilidade e reduzindo erros em campo.
+> 🧩 Each subsystem leverages TeamLib utilities (PID, IMU, Limelight, etc.) to handle complex behavior while keeping logic focused and readable.
 
 ---
 
-## 🧱 Filosofia de Desenvolvimento
+## 🔹 Continuous Integration (CI) & Code Quality
 
-> “Our codebase is split into two distinct parts: **robot code** and **library code**.
-> The robot code contains everything that you would expect from a command-based project, while the library contains code that should be reusable for multiple seasons.”
+Team All Might maintains a **CI/CD (Continuous Integration / Continuous Deployment)** pipeline to ensure code reliability and maintain professional standards.
 
-Essa filosofia garante:
+### 🔄 Automated Pipeline Includes:
 
-* 🔧 Facilidade de manutenção;
-* ♻️ Reaproveitamento entre temporadas;
-* 📚 Documentação clara e universal;
-* 🚀 Evolução contínua da base técnica da All Might.
+* **✅ Validation:**
+  Each *push* or *pull request* triggers a GitHub Actions workflow that checks:
+
+  * Package and naming structure
+  * FTC Gradle build
+  * Code style and documentation compliance
+
+* **🧪 Unit & Integration Tests:**
+  TeamLib components such as PIDController, IMUHelper, and LimelightHelper undergo simulation-based testing to validate their mathematical behavior.
+
+* **📦 Automated Deploy (optional):**
+  When a stable build is tagged as a *release*, the pipeline automatically generates a signed `.apk` for the **Robot Controller (RC)**.
+
+> 💡 This ensures that **no unverified change ever reaches the field**, improving reliability and reducing runtime issues during matches.
 
 ---
 
+## 🧱 Development Philosophy
 
-## 👑 Créditos
+> “Our codebase is divided into two distinct layers: **robot code** and **library code**.
+> The robot code defines behavior and strategy, while the library code provides reusable, tested systems for multiple seasons.”
 
-Desenvolvido por **Equipe FTC All Might #32576**
+This philosophy promotes:
 
-Liderança de Software: [**Nobre**](https://github.com/meuNobre)
+* 🔧 **Simplified maintenance**
+* ♻️ **Cross-season reusability**
+* 📚 **Clear and unified documentation**
+* 🚀 **Continuous technical evolution of Team All Might**
 
-Baseado na filosofia **Next Generation Codebase (NGC)**
+---
 
+## 👑 Credits
+
+Developed by **FTC Team #32576 — All Might**
+**Software Leadership:** [**Nobre**](https://github.com/meuNobre)
+
+Based on the **Next Generation Codebase (NGC)** architecture.
