@@ -1,5 +1,6 @@
 package ftc.team.allmight.plusultra.teamcode.auto;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -35,13 +36,17 @@ public class MyAutonomousSemLimelight extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Initialize DriveConstants (adjust params for your hardware)
-        DriveConstants.initialize(3.54, 20.0, 28, 18.0);  // wheelDia(in), gearRatio, encoderCPR, trackWidth(in)
+        DriveConstants.initialize(3.54, 20.0, 28, 11.811);  // wheelDia(in), gearRatio, encoderCPR, trackWidth(in)
+        telemetry.addData("Wheel Radius", DriveConstants.WHEEL_RADIUS_METERS);
+        telemetry.addData("Ticks/Rev", DriveConstants.TICKS_PER_REVOLUTION);
+        telemetry.addData("IN_PER_TICK", DriveConstants.IN_PER_TICK);
+        telemetry.addData("Track Width", DriveConstants.TRACK_WIDTH_METERS);
         telemetry.update();  // Display init logs
 
         if (!DriveConstants.isValid()) {
             telemetry.addLine("ERROR: Invalid DriveConstants!");
             telemetry.update();
-            return;
+//            return;
         }
 
         // DriveParams from DriveConstants
@@ -85,10 +90,15 @@ public class MyAutonomousSemLimelight extends LinearOpMode {
         if (waypoints == null || waypoints.isEmpty()) {
             telemetry.addLine("ERROR: Failed to load path JSON!");
             telemetry.update();
-            return;
+            return;  // ✅ garante que não vai acessar null
         }
 
-        telemetry.addLine("Path loaded: " + waypoints.size() + " waypoints");
+        if (waypoints != null) {
+            telemetry.addLine("Path loaded: " + waypoints.size() + " waypoints");
+        } else {
+            telemetry.addLine("Path not loaded (null)");
+        }
+
         telemetry.update();
 
         waitForStart();
@@ -120,8 +130,10 @@ public class MyAutonomousSemLimelight extends LinearOpMode {
                         .splineTo(new Vector2d(targetPose.position.x, targetPose.position.y), targetPose.heading)
                         .build();
 
+                TelemetryPacket packet = new TelemetryPacket();
+
                 // Run action manually
-                while (opModeIsActive() && segAction.run(null)) {
+                while (opModeIsActive() && segAction.run(packet)) {
                     rrHelper.update(dt);
                     drive.updatePoseEstimate();
                     telemetry.addData("Current Pose", drive.localizer.getPose().toString());
@@ -158,6 +170,7 @@ public class MyAutonomousSemLimelight extends LinearOpMode {
         List<Pose2d> poses = new ArrayList<>();
         try {
             InputStream is = context.getAssets().open("paths/" + fileName + ".json");
+//            InputStream is = MyAutonomousSemLimelight.class.getResourceAsStream(("/ftc/team/allmight/plusultra/teamcode/assets/path" + fileName + ".json"));
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             StringBuilder sb = new StringBuilder();
             String line;

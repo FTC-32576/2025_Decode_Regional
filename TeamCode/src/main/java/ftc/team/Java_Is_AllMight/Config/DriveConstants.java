@@ -212,11 +212,7 @@ public final class DriveConstants {
         IN_PER_TICK = wheelCircumferenceMeters / TICKS_PER_REVOLUTION;
 
         // Log/Validation (can be used in telemetry)
-        telemetry.addData("DriveConstants Initialized:", "See below");
-        telemetry.addData("  Wheel Radius: ", WHEEL_RADIUS_METERS + " m");
-        telemetry.addData("  Ticks/Rev: ", TICKS_PER_REVOLUTION);
-        telemetry.addData("  IN_PER_TICK: ", IN_PER_TICK + " m/tick");
-        telemetry.addData("  Track Width: ", TRACK_WIDTH_METERS + " m");
+
 
     }
 

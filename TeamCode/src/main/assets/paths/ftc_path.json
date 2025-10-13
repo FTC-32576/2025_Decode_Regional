@@ -2,28 +2,28 @@
   "version": "1.0",
   "waypoints": [
     {
-      "x": 0.907222444152832,
-      "y": 2.7389762546539305,
-      "heading": 0,
+      "x": 0.663375,
+      "y": 2.208810013961792,
+      "heading": 0.4244054193614751,
       "prevControlLength": 0.5,
-      "nextControlLength": 0.013724999999999987,
+      "nextControlLength": 0.6176419442120167,
       "velocity": 0,
       "locked": false
     },
     {
-      "x": 0.8751974441528321,
-      "y": 1.4396762546539306,
-      "heading": -24.139448609438237,
-      "prevControlLength": 0.10158148514862339,
-      "nextControlLength": 1.353620272870128,
+      "x": 1.501514986038208,
+      "y": 2.192339986038208,
+      "heading": -84.22567409733675,
+      "prevControlLength": 0.14248756524693643,
+      "nextControlLength": 0.40925158674096795,
       "velocity": 0,
       "locked": false
     },
     {
-      "x": 2.320897444152832,
-      "y": 2.0207012546539307,
-      "heading": 120.46554491946011,
-      "prevControlLength": 0.09023310437417092,
+      "x": 1.455764986038208,
+      "y": 1.057739986038208,
+      "heading": 90,
+      "prevControlLength": 0.19672499999999993,
       "nextControlLength": 0.5,
       "velocity": 0,
       "locked": false
