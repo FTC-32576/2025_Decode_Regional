@@ -3,7 +3,6 @@ package ftc.team.allmight.plusultra.teamcode.auto;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.acmerobotics.roadrunner.Action;
@@ -23,20 +22,15 @@ import java.util.List;
 
 import ftc.team.Java_Is_AllMight.Pathing.RoadRunnerHelper;
 import ftc.team.Java_Is_AllMight.Sensors.IMUHelper;
-import ftc.team.Java_Is_AllMight.Sensors.LimelightHelper;
-import ftc.team.Java_Is_AllMight.Sensors.LimelightDriveController;
-import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.Java_Is_AllMight.Config.DriveConstants;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.TankDrive;
 
-@Autonomous(name = "MyAutonomousOpMode")
-public class MyAutonomousOpMode extends LinearOpMode {
+@Autonomous(name = "Teste do RoadRunner")
+public class MyAutonomousSemLimelight extends LinearOpMode {
 
     private TankDrive drive;
-    private LimelightDriveController llController;
     private RoadRunnerHelper rrHelper;
     private IMUHelper sharedImu;
-    private LimelightHelper sharedLimelight;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -59,22 +53,15 @@ public class MyAutonomousOpMode extends LinearOpMode {
                 0   // rightOffset
         );
 
-        // Initialize shared sensors
+        // Initialize IMU (no Limelight)
         sharedImu = new IMUHelper(
                 hardwareMap, "imu",
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD,
                 RevHubOrientationOnRobot.LogoFacingDirection.UP
         );
-        sharedLimelight = new LimelightHelper(
-                hardwareMap, "limelight", "imu",
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD,
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                new PIDConfig(0.03, 0, 0),  // angle PID
-                new PIDConfig(0.05, 0, 0)   // distance PID
-        );
 
         // Initialize TankDrive and sync with DriveConstants
-        Pose2d initialPose = new Pose2d(0, 0, 0);
+        Pose2d initialPose = new Pose2d(0, 0, 0);  // Assume start at (0,0,0)
         drive = new TankDrive(hardwareMap, initialPose);
 
         // Sync TankDrive params with DriveConstants
@@ -87,22 +74,10 @@ public class MyAutonomousOpMode extends LinearOpMode {
         TankDrive.PARAMS.ramseteZeta = DriveConstants.RAMSETE_ZETA;
         TankDrive.PARAMS.ramseteBBar = DriveConstants.RAMSETE_B;
 
-        // Initialize RoadRunnerHelper
+        // Initialize RoadRunnerHelper (IMU only, no Limelight)
         rrHelper = new RoadRunnerHelper(
                 hardwareMap, "motorEsquerdo", "motorDireito", driveParams,
-                sharedImu, sharedLimelight, initialPose
-        );
-
-        // Initialize LimelightDriveController
-        llController = new LimelightDriveController(
-                hardwareMap, "limelight", "imu",
-                hardwareMap.get(DcMotor.class, "motorEsquerdo"),
-                hardwareMap.get(DcMotor.class, "motorDireito"),
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD,
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                new PIDConfig(0.05, 0, 0),  // distance PID
-                new PIDConfig(0.03, 0, 0),  // angle PID
-                0.5  // max power
+                sharedImu, null, initialPose  // Pass null for Limelight
         );
 
         // Load waypoints from PathPlanner JSON
@@ -121,33 +96,21 @@ public class MyAutonomousOpMode extends LinearOpMode {
 
         double dt = 0.05;  // Loop interval ~50ms
 
-        // 1. Initial alignment with Limelight to waypoint[0]
-        Pose2d firstWaypoint = waypoints.get(0);
-        telemetry.addLine("Aligning to initial waypoint: (" + firstWaypoint.position.x + ", " + firstWaypoint.position.y + ")");
-        telemetry.update();
-
-        boolean aligned = false;
-        while (opModeIsActive() && !aligned) {
-            rrHelper.update(dt);
-            aligned = llController.moveToPosition(firstWaypoint.position.x, firstWaypoint.position.y, dt, telemetry);
-            idle();
-        }
-        llController.stop();
-
-        // Sync pose after alignment
-        rrHelper.setPose(firstWaypoint);
-        drive.localizer.setPose(firstWaypoint);
+        // Set initial pose to first waypoint if provided, else (0,0,0)
+        Pose2d startPose = waypoints.isEmpty() ? initialPose : waypoints.get(0);
+        rrHelper.setPose(startPose);
+        drive.localizer.setPose(startPose);
         drive.updatePoseEstimate();
-        telemetry.addLine("Alignment complete! Pose: " + firstWaypoint);
+        telemetry.addLine("Starting from pose: " + startPose);
         telemetry.update();
 
-        // 2. Follow path with RoadRunner
-        if (waypoints.size() > 1) {
+        // Follow path with RoadRunner (from start to all waypoints)
+        if (!waypoints.isEmpty()) {
             telemetry.addLine("Starting path follow...");
             telemetry.update();
 
-            Pose2d currentPose = firstWaypoint;
-            for (int i = 1; i < waypoints.size() && opModeIsActive(); i++) {
+            Pose2d currentPose = startPose;
+            for (int i = (waypoints.get(0).equals(startPose) ? 1 : 0); i < waypoints.size() && opModeIsActive(); i++) {
                 Pose2d targetPose = waypoints.get(i);
                 telemetry.addLine("Moving to waypoint " + i + ": " + targetPose);
                 telemetry.update();
@@ -157,7 +120,7 @@ public class MyAutonomousOpMode extends LinearOpMode {
                         .splineTo(new Vector2d(targetPose.position.x, targetPose.position.y), targetPose.heading)
                         .build();
 
-                // Run action manually (no dashboard packet)
+                // Run action manually
                 while (opModeIsActive() && segAction.run(null)) {
                     rrHelper.update(dt);
                     drive.updatePoseEstimate();
@@ -167,7 +130,7 @@ public class MyAutonomousOpMode extends LinearOpMode {
                     idle();
                 }
 
-                // Sync pose with fusion after segment
+                // Sync pose after segment (IMU + encoders only)
                 rrHelper.update(dt);
                 drive.localizer.setPose(rrHelper.getPose());
                 drive.updatePoseEstimate();
@@ -175,12 +138,11 @@ public class MyAutonomousOpMode extends LinearOpMode {
                 sleep(100);  // Brief pause
             }
         } else {
-            telemetry.addLine("Only initial waypoint - path complete.");
+            telemetry.addLine("No waypoints - path complete.");
         }
 
         // Stop robot
         drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
-        llController.stop();
         rrHelper.update(0);
 
         telemetry.addLine("Autonomous Finished!");

@@ -2,6 +2,7 @@ package ftc.team.Java_Is_AllMight.Sensors;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -45,7 +46,11 @@ public class LimelightDriveController {
         this.rightMotor = rightMotor;
         this.maxPower = maxPower;
 
-        // Configuração inicial
+        this.leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         this.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }

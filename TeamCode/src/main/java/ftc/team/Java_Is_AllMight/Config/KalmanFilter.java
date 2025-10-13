@@ -1,40 +1,40 @@
 package ftc.team.Java_Is_AllMight.Config;
 
 /**
- * Filtro simples para fusão de pose 2D (x, y, heading) baseado em um
- * Kalman linear simplificado (estimativa e correção por observação de pose).
+ * Simple filter for 2D pose fusion (x, y, heading) based on a
+ * simplified linear Kalman filter (state estimation + observation correction).
  *
- * Notas:
- * - Estado: [x, y, heading]
- * - Modelo de processo tratado como identidade + ruído de processo (Q).
- * - Observação: pose completa (z = [x, y, heading]) com covariância R.
+ * Notes:
+ * - State: [x, y, heading]
+ * - Process model treated as identity + process noise (Q).
+ * - Observation: full pose (z = [x, y, heading]) with covariance R.
  *
- * Este filtro NÃO é um EKF completo — é suficiente para fundir leituras de odo/IMU
- * com correções de pose (por ex. Limelight) em muitos cenários FTC.
+ * This is NOT a full EKF — it's sufficient to fuse odo/IMU readings
+ * with pose corrections (e.g., from Limelight) in most FTC scenarios.
  */
 public class KalmanFilter {
 
-    // Estado
+    // State
     private double x;
     private double y;
-    private double heading; // radianos
+    private double heading; // radians
 
-    // Covariância do estado (3x3) — armazenada plano:
+    // State covariance (3x3) — stored flat
     private double P00, P01, P02;
     private double P10, P11, P12;
     private double P20, P21, P22;
 
-    // Ruído do processo (Q) — confiança na modelagem da odometria (valores pequenos = confiamos)
-    private double qPos;   // para x,y
-    private double qHeading; // para heading
+    // Process noise (Q) — trust in odometry model (smaller values = higher trust)
+    private double qPos;     // for x, y
+    private double qHeading; // for heading
 
     public KalmanFilter(double initX, double initY, double initHeading,
-                                  double initCovPos, double initCovHeading,
-                                  double qPos, double qHeading) {
+                        double initCovPos, double initCovHeading,
+                        double qPos, double qHeading) {
         this.x = initX;
         this.y = initY;
         this.heading = initHeading;
-        // inicializa P diagonal
+        // initialize diagonal P
         this.P00 = initCovPos; this.P01 = 0; this.P02 = 0;
         this.P10 = 0; this.P11 = initCovPos; this.P12 = 0;
         this.P20 = 0; this.P21 = 0; this.P22 = initCovHeading;
@@ -44,36 +44,37 @@ public class KalmanFilter {
     }
 
     /**
-     * Predição pelo modelo de movimento incremental: aplica um deslocamento delta (do odômetro)
-     * deltaX, deltaY (em campo) e deltaHeading (rad). A covariância é expandida por Q.
+     * Prediction step using incremental motion model: applies a delta displacement
+     * (from odometry) — deltaX, deltaY (field frame) and deltaHeading (rad).
+     * Covariance is expanded by Q.
      */
     public void predict(double deltaX, double deltaY, double deltaHeading) {
-        // atualizar estado
+        // Update state
         this.x += deltaX;
         this.y += deltaY;
         this.heading = normalizeAngle(this.heading + deltaHeading);
 
-        // Atualiza P = P + Q (Q diagonal)
+        // Update P = P + Q (Q diagonal)
         P00 += qPos;
         P11 += qPos;
         P22 += qHeading;
     }
 
     /**
-     * Correção usando observação completa de pose (zX, zY, zHeading)
-     * rPos = variância da posição observada (m^2)
-     * rHeading = variância da heading observada (rad^2)
+     * Correction step using a full pose observation (zX, zY, zHeading)
+     * rPos = variance of observed position (m^2)
+     * rHeading = variance of observed heading (rad^2)
      */
     public void correct(double zX, double zY, double zHeading, double rPos, double rHeading) {
-        // Matriz R (observação cov)
+        // Observation covariance matrix R
         double R00 = rPos, R11 = rPos, R22 = rHeading;
 
-        // Inovação y = z - Hx  (H = I)
+        // Innovation y = z - Hx  (H = I)
         double y0 = zX - x;
         double y1 = zY - y;
         double y2 = shortestAngularDifference(zHeading, heading);
 
-        // S = P + R  (porque H = I)
+        // S = P + R  (since H = I)
         double S00 = P00 + R00;
         double S01 = P01; // off diag P01 + 0
         double S02 = P02;
@@ -92,7 +93,7 @@ public class KalmanFilter {
         );
 
         if (Math.abs(detS) < 1e-12) {
-            // não numericamente estável, ignora correção
+            // Not numerically stable — skip correction
             return;
         }
 
@@ -119,12 +120,12 @@ public class KalmanFilter {
         double K21 = P20*invS01 + P21*invS11 + P22*invS21;
         double K22 = P20*invS02 + P21*invS12 + P22*invS22;
 
-        // Atualiza estado: x = x + K * y
+        // Update state: x = x + K * y
         x += K00*y0 + K01*y1 + K02*y2;
         y += K10*y0 + K11*y1 + K12*y2;
         heading = normalizeAngle( heading + (K20*y0 + K21*y1 + K22*y2) );
 
-        // Atualiza covariância: P = (I - K) P
+        // Update covariance: P = (I - K) P
         // Compute (I - K)
         double I_K00 = 1 - K00, I_K01 = -K01,      I_K02 = -K02;
         double I_K10 = -K10,     I_K11 = 1 - K11,  I_K12 = -K12;
@@ -157,7 +158,7 @@ public class KalmanFilter {
 
     // Helpers
     private static double shortestAngularDifference(double a, double b) {
-        // retorna a - b ajustado para -pi..pi
+        // returns a - b adjusted to -pi..pi
         double d = a - b;
         while (d > Math.PI) d -= 2*Math.PI;
         while (d < -Math.PI) d += 2*Math.PI;

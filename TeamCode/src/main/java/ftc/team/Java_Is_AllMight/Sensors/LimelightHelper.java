@@ -98,7 +98,7 @@ public class LimelightHelper {
         return null;
     }
 
-    /** Returns the distance to a given fiducial */
+    /** Returns the distance to a given fiducial In mm */
     public double getDistanceToFiducial(LLResultTypes.FiducialResult fiducial) {
         if (fiducial != null) {
             Pose3D robotPose = fiducial.getRobotPoseTargetSpace();
@@ -107,6 +107,19 @@ public class LimelightHelper {
                             robotPose.getPosition().y * robotPose.getPosition().y +
                             robotPose.getPosition().z * robotPose.getPosition().z
             );
+        }
+        return -1;
+    }
+
+    /** Returns the distance to a given fiducial In m */
+    public double getDistanceToFiducialinMeters(LLResultTypes.FiducialResult fiducial) {
+        if (fiducial != null) {
+            Pose3D robotPose = fiducial.getRobotPoseTargetSpace();
+            return Math.sqrt(
+                    robotPose.getPosition().x * robotPose.getPosition().x +
+                            robotPose.getPosition().y * robotPose.getPosition().y +
+                            robotPose.getPosition().z * robotPose.getPosition().z
+            ) /  1000.0;
         }
         return -1;
     }

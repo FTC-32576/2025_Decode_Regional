@@ -3,6 +3,7 @@ package ftc.team.Java_Is_AllMight.Pathing;
 import com.acmerobotics.roadrunner.Pose2d;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import ftc.team.Java_Is_AllMight.Config.KalmanFilter;
@@ -85,6 +86,10 @@ public class RoadRunnerHelper {
         this.hardwareMap = hardwareMap;
         this.leftMotor = hardwareMap.get(DcMotor.class, leftMotorName);
         this.rightMotor = hardwareMap.get(DcMotor.class, rightMotorName);
+        this.leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.params = params;
         this.imu = imuHelper;
         this.limelight = limelightHelper;
