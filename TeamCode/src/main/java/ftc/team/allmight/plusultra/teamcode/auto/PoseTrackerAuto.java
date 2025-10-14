@@ -22,7 +22,7 @@ public class PoseTrackerAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Inicializa DriveConstants (ajuste conforme seu bot)
+        // Inicializa DriveConstants
         DriveConstants.initialize(3.54, 20.0, 28, 11.811);
 
         // Inicializa IMU
