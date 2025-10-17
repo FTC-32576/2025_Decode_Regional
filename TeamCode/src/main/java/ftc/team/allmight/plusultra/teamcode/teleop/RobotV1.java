@@ -4,7 +4,7 @@ import ftc.team.allmight.plusultra.teamcode.commands.ShooterCommand;
 import ftc.team.allmight.plusultra.teamcode.subsystems.ShooterSubsystem;
 import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
 import ftc.team.Java_Is_AllMight.Logging.EnchancedLoggers.CustomChassisSpeedsLogger;
-import ftc.team.Java_Is_AllMight.Sensors.IMUHelper;
+import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
+
+
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name = "RoboV1")
@@ -20,7 +22,7 @@ public class RobotV1 extends OpMode {
 
     private DcMotor intakeMotor, leftMotor, rightMotor;
     private CustomChassisSpeedsLogger chassisLogger;
-    private IMUHelper imu;
+    private IMUMight imu;
 
     private final RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
     private final RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
@@ -42,7 +44,7 @@ public class RobotV1 extends OpMode {
         shooterSubsystem = new ShooterSubsystem(hardwareMap, "shooter", telemetry);
         shooterCommand = new ShooterCommand(shooterSubsystem);
 
-        imu = new IMUHelper(hardwareMap, "imu", RevHubOrientationOnRobot.UsbFacingDirection.UP, RevHubOrientationOnRobot.LogoFacingDirection.FORWARD);
+        imu = new IMUMight(hardwareMap, "imu", RevHubOrientationOnRobot.UsbFacingDirection.UP, RevHubOrientationOnRobot.LogoFacingDirection.FORWARD);
 
         Heading = imu.getYaw();
         Pitch = imu.getPitch();

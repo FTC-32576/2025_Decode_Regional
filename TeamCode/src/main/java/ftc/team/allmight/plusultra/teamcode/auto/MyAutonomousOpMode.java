@@ -4,14 +4,12 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ftc.team.Java_Is_AllMight.Pathing.RoadRunnerHelper;
-import ftc.team.Java_Is_AllMight.Sensors.IMUHelper;
-import ftc.team.Java_Is_AllMight.Sensors.LimelightHelper;
+import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
+import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 import ftc.team.Java_Is_AllMight.Sensors.LimelightDriveController;
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.Java_Is_AllMight.Config.DriveConstants;
@@ -35,8 +33,8 @@ public class MyAutonomousOpMode extends LinearOpMode {
     private TankDrive drive;
     private LimelightDriveController llController;
     private RoadRunnerHelper rrHelper;
-    private IMUHelper sharedImu;
-    private LimelightHelper sharedLimelight;
+    private IMUMight sharedImu;
+    private LimeMight sharedLimelight;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -60,12 +58,12 @@ public class MyAutonomousOpMode extends LinearOpMode {
         );
 
         // Initialize shared sensors
-        sharedImu = new IMUHelper(
+        sharedImu = new IMUMight(
                 hardwareMap, "imu",
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD,
                 RevHubOrientationOnRobot.LogoFacingDirection.UP
         );
-        sharedLimelight = new LimelightHelper(
+        sharedLimelight = new LimeMight(
                 hardwareMap, "limelight", "imu",
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD,
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,

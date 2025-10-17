@@ -7,19 +7,19 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import ftc.team.Java_Is_AllMight.Config.KalmanFilter;
-import ftc.team.Java_Is_AllMight.Sensors.IMUHelper;
-import ftc.team.Java_Is_AllMight.Sensors.LimelightHelper;
+import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
+import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 
 /**
  * RoadRunnerHelper (TeamLib)
  *
  * - Faz odometria básica por encoders (tank) + IMU yaw
- * - Opcional: usa LimelightHelper para correções de pose quando disponível
+ * - Opcional: usa LimeMight para correções de pose quando disponível
  * - Expõe um estado Pose2d (x,y,heading) compatível conceitualmente com RoadRunner
  *
  * Uso:
  * - Instanciar no init do robot/OpMode passando hardwareMap, motores de tração (left,right),
- *   parâmetros de roda/encoders e opcionalmente LimelightHelper e IMUHelper.
+ *   parâmetros de roda/encoders e opcionalmente LimeMight e IMUMight.
  * - Chamar update(dt) periodicamente (dt em segundos).
  */
 public class RoadRunnerHelper {
@@ -44,8 +44,8 @@ public class RoadRunnerHelper {
     private final HardwareMap hardwareMap;
     private final DcMotor leftMotor;
     private final DcMotor rightMotor;
-    private final IMUHelper imu;
-    private final LimelightHelper limelight; // opcional (pode ser null)
+    private final IMUMight imu;
+    private final LimeMight limelight; // opcional (pode ser null)
     private final boolean useLimelight;
 
     // odometria
@@ -71,16 +71,16 @@ public class RoadRunnerHelper {
      * @param leftMotorName nome do motor/encoder esquerdo
      * @param rightMotorName nome do motor/encoder direito
      * @param params parâmetros do drive/encoders
-     * @param imuHelper IMUHelper (obrigatório)
-     * @param limelightHelper LimelightHelper (opcional - pode ser null)
+     * @param imuMight IMUMight (obrigatório)
+     * @param limeMight LimeMight (opcional - pode ser null)
      * @param startPose pose inicial (metros / radians)
      */
     public RoadRunnerHelper(HardwareMap hardwareMap,
                             String leftMotorName,
                             String rightMotorName,
                             DriveParams params,
-                            IMUHelper imuHelper,
-                            LimelightHelper limelightHelper,
+                            IMUMight imuMight,
+                            LimeMight limeMight,
                             Pose2d startPose) {
 
         this.hardwareMap = hardwareMap;
@@ -91,9 +91,9 @@ public class RoadRunnerHelper {
         this.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.params = params;
-        this.imu = imuHelper;
-        this.limelight = limelightHelper;
-        this.useLimelight = (limelightHelper != null);
+        this.imu = imuMight;
+        this.limelight = limeMight;
+        this.useLimelight = (limeMight != null);
 
         // inicializa odometria
         this.lastLeftTicks = leftMotor.getCurrentPosition();
@@ -157,7 +157,7 @@ public class RoadRunnerHelper {
         if (useLimelight && limelight.isConnected()) {
             // obtém resultado e usa botpose (MT2 preferida)
             try {
-                // LimelightHelper expõe getEstimatedFieldPosition() retornando Pose3D
+                // LimeMight expõe getEstimatedFieldPosition() retornando Pose3D
                 org.firstinspires.ftc.robotcore.external.navigation.Pose3D llPose3d = limelight.getEstimatedFieldPosition();
                 if (llPose3d != null) {
                     // converte para Pose2d (RoadRunner)

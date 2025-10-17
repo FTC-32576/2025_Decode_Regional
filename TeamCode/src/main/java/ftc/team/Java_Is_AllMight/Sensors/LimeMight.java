@@ -17,13 +17,13 @@ import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.Java_Is_AllMight.Config.PIDController;
 
 
-public class LimelightHelper {
+public class LimeMight {
 
     // ==========================
     // VARIABLES
     // ==========================
     private final Limelight3A limelight;
-    private final IMUHelper imu;
+    private final IMUMight imu;
     private final PIDConfig pidDistance;
     private final PIDConfig pidAngle;
 
@@ -38,14 +38,14 @@ public class LimelightHelper {
     // CONSTRUCTOR
     // ==========================
 
-    public LimelightHelper(HardwareMap hardwareMap, String cameraName,
-                           String imuName,
-                           RevHubOrientationOnRobot.UsbFacingDirection usbDir,
-                           RevHubOrientationOnRobot.LogoFacingDirection logoDir,
-                           PIDConfig pidAngle, PIDConfig pidDistance) {
+    public LimeMight(HardwareMap hardwareMap, String cameraName,
+                     String imuName,
+                     RevHubOrientationOnRobot.UsbFacingDirection usbDir,
+                     RevHubOrientationOnRobot.LogoFacingDirection logoDir,
+                     PIDConfig pidAngle, PIDConfig pidDistance) {
 
         this.limelight = hardwareMap.get(Limelight3A.class, cameraName);
-        this.imu = new IMUHelper(hardwareMap, imuName, usbDir, logoDir);
+        this.imu = new IMUMight(hardwareMap, imuName, usbDir, logoDir);
 
         this.pidAngle = pidAngle;
         this.pidDistance = pidAngle;

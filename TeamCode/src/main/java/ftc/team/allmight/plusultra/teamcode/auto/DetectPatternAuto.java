@@ -4,7 +4,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import ftc.team.Java_Is_AllMight.Sensors.LimelightHelper;
+import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 import ftc.team.allmight.plusultra.teamcode.utils.AprilTagPatternUtil;
 
 
@@ -12,12 +12,12 @@ import ftc.team.allmight.plusultra.teamcode.utils.AprilTagPatternUtil;
 public class DetectPatternAuto extends LinearOpMode {
 
     private AprilTagPatternUtil patternUtil;
-    private LimelightHelper limelightHelper;
+    private LimeMight limeMight;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        limelightHelper = new LimelightHelper(hardwareMap,
+        limeMight = new LimeMight(hardwareMap,
                 "limelight",
                 "imu",
                 RevHubOrientationOnRobot.UsbFacingDirection.UP,
@@ -26,7 +26,7 @@ public class DetectPatternAuto extends LinearOpMode {
                 null
         );
 
-        patternUtil = new AprilTagPatternUtil(limelightHelper);
+        patternUtil = new AprilTagPatternUtil(limeMight);
         waitForStart();
 
         AprilTagPatternUtil.Pattern pattern = patternUtil.detectPattern(telemetry);

@@ -38,6 +38,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Integrate with TankDrive: After init, copy values to TankDrive.PARAMS (see example in comments).
  */
 public final class DriveConstants {
+    private static double wheelDiameterInches;
+
     private DriveConstants() {}
 
     // ========================================================================
@@ -192,6 +194,7 @@ public final class DriveConstants {
      * - TICKS_PER_REVOLUTION = 2240.
      */
     public static void initialize(double wheelDiameterInches, double gearRatio, int encoderCPR, double trackWidthInches) {
+        DriveConstants.wheelDiameterInches = wheelDiameterInches;
         // Basic validations
         if (wheelDiameterInches <= 0 || gearRatio <= 0 || encoderCPR <= 0 || trackWidthInches <= 0) {
             throw new IllegalArgumentException("Hardware parameters must be positive!");

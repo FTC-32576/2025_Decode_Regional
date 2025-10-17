@@ -4,14 +4,12 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ftc.team.Java_Is_AllMight.Pathing.RoadRunnerHelper;
-import ftc.team.Java_Is_AllMight.Sensors.IMUHelper;
+import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
 import ftc.team.Java_Is_AllMight.Config.DriveConstants;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.TankDrive;
 
@@ -31,7 +29,7 @@ public class MyAutonomousSemLimelight extends LinearOpMode {
 
     private TankDrive drive;
     private RoadRunnerHelper rrHelper;
-    private IMUHelper sharedImu;
+    private IMUMight sharedImu;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -59,7 +57,7 @@ public class MyAutonomousSemLimelight extends LinearOpMode {
         );
 
         // Initialize IMU (no Limelight)
-        sharedImu = new IMUHelper(
+        sharedImu = new IMUMight(
                 hardwareMap, "imu",
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD,
                 RevHubOrientationOnRobot.LogoFacingDirection.UP

@@ -11,7 +11,7 @@ import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 
 public class LimelightDriveController {
 
-    public final LimelightHelper limelightHelper;
+    public final LimeMight limeMight;
     private final DcMotor leftMotor;
     private final DcMotor rightMotor;
 
@@ -39,7 +39,7 @@ public class LimelightDriveController {
                                     PIDConfig pidDistance,
                                     PIDConfig pidAngle,
                                     double maxPower) {
-        this.limelightHelper = new LimelightHelper(
+        this.limeMight = new LimeMight(
                 hardwareMap, cameraName, imuName, usbDir, logoDir, pidDistance, pidAngle
         );
         this.leftMotor = leftMotor;
@@ -65,7 +65,7 @@ public class LimelightDriveController {
      * @return true if close enough
      */
     public boolean moveToPosition(double xTarget, double yTarget, double dtSeconds, Telemetry telemetry) {
-        double[] powers = limelightHelper.calculateMovementToPosition(xTarget, yTarget, dtSeconds);
+        double[] powers = limeMight.calculateMovementToPosition(xTarget, yTarget, dtSeconds);
 
         // Frente e rotação
         double forward = powers[0];
@@ -87,7 +87,7 @@ public class LimelightDriveController {
         }
 
         // Condição de parada (distância menor que 0.1m)
-        Pose3D pose = limelightHelper.getEstimatedFieldPosition();
+        Pose3D pose = limeMight.getEstimatedFieldPosition();
         if (pose == null) return false;
 
         double dx = xTarget - pose.getPosition().x;
@@ -109,6 +109,6 @@ public class LimelightDriveController {
 
     /** Telemetria completa do Limelight */
     public void telemetry(Telemetry telemetry) {
-        limelightHelper.telemetryFull(telemetry);
+        limeMight.telemetryFull(telemetry);
     }
 }

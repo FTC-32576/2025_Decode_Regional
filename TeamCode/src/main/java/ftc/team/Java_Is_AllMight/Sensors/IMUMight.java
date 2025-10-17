@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-public class IMUHelper {
+public class IMUMight {
 
     private enum Axis {
         YAW,
@@ -25,9 +25,9 @@ public class IMUHelper {
      * @param usbFacingDirection USB FacingDirection of the Config Hub
      * @param logoFacingDirection Logo FacingDirection of the Config Hub
      */
-    public IMUHelper(HardwareMap hardwareMap, String imuName,
-                     RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection,
-                     RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection){
+    public IMUMight(HardwareMap hardwareMap, String imuName,
+                    RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection,
+                    RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection){
 
         imu = hardwareMap.get(IMU.class, imuName);
 
