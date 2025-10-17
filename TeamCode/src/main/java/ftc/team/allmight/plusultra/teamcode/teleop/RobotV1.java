@@ -5,6 +5,8 @@ import ftc.team.allmight.plusultra.teamcode.subsystems.ShooterSubsystem;
 import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
 import ftc.team.Java_Is_AllMight.Logging.EnchancedLoggers.CustomChassisSpeedsLogger;
 import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
+import ftc.team.allmight.plusultra.teamcode.utils.MathUtils;
+import ftc.team.allmight.plusultra.teamcode.utils.ResultadoMira;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -14,7 +16,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 
-
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name = "RoboV1")
@@ -27,6 +31,8 @@ public class RobotV1 extends OpMode {
     private final RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
     private final RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
+    Pose2D posicaoAtual = new Pose2D(DistanceUnit.CM, 30, 40, AngleUnit.DEGREES, 90);
+    ResultadoMira resultado = MathUtils.calcularMira(posicaoAtual);
     private double inputY, inputX;
     private YawPitchRollAngles robotOrientation;
 
