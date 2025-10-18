@@ -33,13 +33,13 @@ public class AutoAimUtils {
         if(leftMotor == null || rightMotor == null || shooterCommand == null || alliance == null)
             return false;
 
-        // 1️⃣ Tenta usar Limelight, se tiver
+        //  Tenta usar Limelight, se tiver
         FiducialResult fid = getTargetFiducial(lime, alliance);
         if(fid != null) {
             return aimWithLimelight(lime, fid, leftMotor, rightMotor, shooterCommand, pidConfig, maxPower);
         }
 
-        // 2️⃣ Se não viu Limelight, fallback usando odometria
+        // Se não viu Limelight, fallback usando odometria
         if(drive != null) {
             Pose2d pose = drive.getPoseEstimate();
             Pose2d goalPose = FieldUtils.getGoalPose(alliance);
