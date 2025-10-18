@@ -1,13 +1,17 @@
 package ftc.team.allmight.plusultra.teamcode.teleop;
 
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.allmight.plusultra.teamcode.commands.ShooterCommand;
+import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
 import ftc.team.allmight.plusultra.teamcode.subsystems.ShooterSubsystem;
 import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
 import ftc.team.Java_Is_AllMight.Logging.EnchancedLoggers.CustomChassisSpeedsLogger;
 import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
-import ftc.team.allmight.plusultra.teamcode.utils.MathUtils;
-import ftc.team.allmight.plusultra.teamcode.utils.ResultadoMira;
+import ftc.team.Java_Is_AllMight.Utils.Alliance;
+import ftc.team.allmight.plusultra.teamcode.utils.AutoAimUtils;
+import ftc.team.allmight.plusultra.teamcode.utils.FieldUtils;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,9 +20,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name = "RoboV1")
@@ -31,8 +32,8 @@ public class RobotV1 extends OpMode {
     private final RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
     private final RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
-    Pose2D posicaoAtual = new Pose2D(DistanceUnit.CM, 30, 40, AngleUnit.DEGREES, 90);
-    ResultadoMira resultado = MathUtils.calcularMira(posicaoAtual);
+    private SampleTankDrive drive;
+
     private double inputY, inputX;
     private YawPitchRollAngles robotOrientation;
 
@@ -40,6 +41,13 @@ public class RobotV1 extends OpMode {
 
     private ShooterSubsystem shooterSubsystem;
     private ShooterCommand shooterCommand;
+
+    // Coordenadas do GOAL (em centímetros)
+    // Ajuste conforme a posição real no campo
+    private  Pose2d GOAL_POSE;
+    private Alliance alliance = Alliance.RED;
+
+    PIDConfig turnPIDConfig = new PIDConfig(0.03, 0.0, 0.002);
 
     @Override
     public void init() {
@@ -49,6 +57,8 @@ public class RobotV1 extends OpMode {
         intakeMotor = getHardware(DcMotor.class, "intake");
         shooterSubsystem = new ShooterSubsystem(hardwareMap, "shooter", telemetry);
         shooterCommand = new ShooterCommand(shooterSubsystem);
+        drive = new SampleTankDrive(hardwareMap);
+
 
         imu = new IMUMight(hardwareMap, "imu", RevHubOrientationOnRobot.UsbFacingDirection.UP, RevHubOrientationOnRobot.LogoFacingDirection.FORWARD);
 
@@ -61,6 +71,7 @@ public class RobotV1 extends OpMode {
 
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        GOAL_POSE = FieldUtils.getGoalPose(Alliance.BLUE);
 
     }
 
@@ -90,8 +101,15 @@ public class RobotV1 extends OpMode {
             intakeMotor.setPower(0);
         }
 
+        if(gamepad1.a){
+            AutoAimUtils.aimAndAdjustPID(drive, leftMotor, rightMotor, shooterCommand, GOAL_POSE, turnPIDConfig);
+        }
+
+
         telemetry.addData("Atributos do IMU", "Yaw: %s, Pitch %s, Roll %s", imu.getYaw(), imu.getPitch(), imu.getRoll());
         telemetry.update();
+        drive.update();
+
 
     }
 

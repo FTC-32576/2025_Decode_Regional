@@ -1,8 +1,6 @@
 package ftc.team.allmight.plusultra.teamcode.utils;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 public class MathUtils {
 
@@ -17,10 +15,10 @@ public class MathUtils {
         return aSin;
     }
 
-    public static ResultadoMira calcularMira(Pose2D posicaoDoRobo){
-        double dX = posicaoDoRobo.getX(DistanceUnit.CM);
-        double dY = posicaoDoRobo.getY(DistanceUnit.CM);
-        double heading = posicaoDoRobo.getHeading(AngleUnit.DEGREES);
+    public static ResultadoMira calcularMira(Pose2d posicaoDoRobo){
+        double dX = posicaoDoRobo.getX();
+        double dY = posicaoDoRobo.getY();
+        double heading = posicaoDoRobo.getHeading();
 
         double d = calcularDistanciaAteOGoal(dY,dX);
         double arcoSeno = arcoSeno(dY, d);
