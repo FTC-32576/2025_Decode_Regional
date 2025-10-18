@@ -6,8 +6,8 @@ import ftc.team.Java_Is_AllMight.Utils.Alliance;
 public class FieldUtils {
 
     // Dimensões do campo em cm
-    private static final double FIELD_WIDTH = 365.76;
-    private static final double FIELD_HEIGHT = 365.76;
+    public static final double FIELD_WIDTH = 365.76;
+    public static final double FIELD_HEIGHT = 365.76;
 
     // Poses do goal para cada aliança
     private static final Pose2d RED_GOAL_POSE  = new Pose2d(FIELD_WIDTH - 10, FIELD_HEIGHT - 10, Math.toRadians(-45));

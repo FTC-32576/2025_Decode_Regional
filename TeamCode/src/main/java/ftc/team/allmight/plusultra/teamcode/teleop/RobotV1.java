@@ -10,6 +10,7 @@ import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
 import ftc.team.Java_Is_AllMight.Utils.Alliance;
 import ftc.team.allmight.plusultra.teamcode.utils.AutoAimUtils;
 import ftc.team.allmight.plusultra.teamcode.utils.FieldUtils;
+import ftc.team.allmight.plusultra.teamcode.utils.MathUtils;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -88,13 +89,6 @@ public class RobotV1 extends OpMode {
 
         this.moveTank(leftPower, rightPower);
 
-
-        if(gamepad1.right_bumper){
-            shooterCommand.execute(1);
-        }else{
-            shooterCommand.end();
-        }
-
         if(gamepad1.left_bumper){
             intakeMotor.setPower(-0.9);
         }else{
@@ -102,7 +96,23 @@ public class RobotV1 extends OpMode {
         }
 
         if(gamepad1.a){
-            AutoAimUtils.aimAndAdjustPID(drive, leftMotor, rightMotor, shooterCommand, GOAL_POSE, turnPIDConfig);
+            AutoAimUtils.aimAjust(null, alliance, drive, leftMotor, rightMotor, null, turnPIDConfig, 0.5);
+        }
+
+        // Right bumper: liga shooter baseado na distância do robô ao GOAL
+        if(gamepad1.right_bumper){
+            Pose2d currentPose = drive.getPoseEstimate();
+            Pose2d goalPose = FieldUtils.getGoalPose(alliance);
+
+            double dX = goalPose.getX() - currentPose.getX();
+            double dY = goalPose.getY() - currentPose.getY();
+
+            double distancia = MathUtils.calcularDistanciaAteOGoal(dY, dX);
+
+            double shooterPower = MathUtils.CalculateShooterPower(distancia / 10.0); // dividir por 10 se MathUtils espera em dm
+            shooterCommand.execute(shooterPower);
+        } else {
+            shooterCommand.end();
         }
 
 

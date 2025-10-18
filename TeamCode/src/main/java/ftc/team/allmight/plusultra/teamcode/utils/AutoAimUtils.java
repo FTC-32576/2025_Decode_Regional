@@ -1,64 +1,122 @@
 package ftc.team.allmight.plusultra.teamcode.utils;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.limelightvision.LLResultTypes.FiducialResult;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+import java.util.List;
+
+import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
+import ftc.team.Java_Is_AllMight.Utils.Alliance;
 import ftc.team.allmight.plusultra.teamcode.commands.ShooterCommand;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import ftc.team.Java_Is_AllMight.Config.PIDController;
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 
 public class AutoAimUtils {
 
-    /**
-     * Gira o robô usando PID até mirar no alvo e ajusta shooter.
-     * @param drive      Instância do SampleTankDrive do RoadRunner
-     * @param leftMotor  Motor esquerdo
-     * @param rightMotor Motor direito
-     * @param shooter    Comando do shooter
-     * @param goalPose   Posição do GOAL
-     * @param pidConfig  Configuração do PID para o giro
-     */
-    public static void aimAndAdjustPID(SampleTankDrive drive,
-                                       DcMotor leftMotor,
+    private static final double TARGET_DISTANCE = 1000; // mm
+    private static final double DISTANCE_TOLERANCE = 50; // mm
+    private static final double YAW_TOLERANCE = 2;       // °
+
+    // Métodoo: tenta mirar usando Limelight e odometria
+    public static boolean aimAjust(LimeMight lime,
+                                   Alliance alliance,
+                                   SampleTankDrive drive,
+                                   DcMotor leftMotor,
+                                   DcMotor rightMotor,
+                                   ShooterCommand shooterCommand,
+                                   PIDConfig pidConfig,
+                                   double maxPower) {
+
+        if(leftMotor == null || rightMotor == null || shooterCommand == null || alliance == null)
+            return false;
+
+        // 1️⃣ Tenta usar Limelight, se tiver
+        FiducialResult fid = getTargetFiducial(lime, alliance);
+        if(fid != null) {
+            return aimWithLimelight(lime, fid, leftMotor, rightMotor, shooterCommand, pidConfig, maxPower);
+        }
+
+        // 2️⃣ Se não viu Limelight, fallback usando odometria
+        if(drive != null) {
+            Pose2d pose = drive.getPoseEstimate();
+            Pose2d goalPose = FieldUtils.getGoalPose(alliance);
+            return aimWithPose(leftMotor, rightMotor, shooterCommand, pidConfig, maxPower, pose, goalPose);
+        }
+
+        return false;
+    }
+
+    /** Pega a tag da aliança se o Limelight estiver ativo */
+    private static FiducialResult getTargetFiducial(LimeMight lime, Alliance alliance) {
+        if(lime == null) return null;
+        int targetID = alliance.getTagID();
+
+        List<FiducialResult> fiducials = lime.getFiducials();
+        if(fiducials != null) {
+            for(FiducialResult f : fiducials) {
+                if(f.getFiducialId() == targetID) return f;
+            }
+        }
+        return null;
+    }
+
+    /** Mira usando Limelight */
+    private static boolean aimWithLimelight(LimeMight lime,
+                                            FiducialResult fid,
+                                            DcMotor leftMotor,
+                                            DcMotor rightMotor,
+                                            ShooterCommand shooterCommand,
+                                            PIDConfig pidConfig,
+                                            double maxPower) {
+        PIDController turnPID = new PIDController(pidConfig);
+
+        double yaw = lime.getYawToFiducial(fid);
+        double distance = lime.getDistanceToFiducial(fid);
+        double turnPower = Range.clip(turnPID.calculate(0, yaw), -maxPower, maxPower);
+
+        leftMotor.setPower(-turnPower);
+        rightMotor.setPower(turnPower);
+
+        boolean aligned = Math.abs(yaw) < YAW_TOLERANCE && Math.abs(distance - TARGET_DISTANCE) < DISTANCE_TOLERANCE;
+
+        if(aligned) shooterCommand.execute(MathUtils.CalculateShooterPower(distance / 10));
+        else shooterCommand.end();
+
+        return aligned;
+    }
+
+    /** Mira usando apenas a pose estimada (odometria / RoadRunner) */
+    private static boolean aimWithPose(DcMotor leftMotor,
                                        DcMotor rightMotor,
-                                       ShooterCommand shooter,
-                                       Pose2d goalPose,
-                                       PIDConfig pidConfig) {
+                                       ShooterCommand shooterCommand,
+                                       PIDConfig pidConfig,
+                                       double maxPower,
+                                       Pose2d currentPose,
+                                       Pose2d goalPose) {
 
         PIDController turnPID = new PIDController(pidConfig);
 
-        // Atualiza odometria
-        drive.update();
-        Pose2d pose = drive.getPoseEstimate();
+        double relX = goalPose.getX() - currentPose.getX();
+        double relY = goalPose.getY() - currentPose.getY();
 
-        // Calcula posição relativa
-        double relX = goalPose.getX() - pose.getX();
-        double relY = goalPose.getY() - pose.getY();
-        Pose2d relativePose = new Pose2d(relX, relY, pose.getHeading());
+        double yaw = Math.toDegrees(Math.atan2(relY, relX)) - Math.toDegrees(currentPose.getHeading());
+        while(yaw > 180) yaw -= 360;
+        while(yaw < -180) yaw += 360;
 
-        // Calcula mira
-        ResultadoMira resultado = MathUtils.calcularMira(relativePose);
+        double distance = Math.hypot(relX, relY);
+        double turnPower = Range.clip(turnPID.calculate(0, yaw), -maxPower, maxPower);
 
-        // Ajusta potência do shooter
-        double shooterPower = MathUtils.CalculateShooterPower(resultado.distancia);
-        shooter.execute(shooterPower);
-
-        // Calcula erro angular
-        double targetAngleDeg = Math.toDegrees(resultado.angulo);
-        double robotHeadingDeg = Math.toDegrees(pose.getHeading());
-        double angleError = targetAngleDeg - robotHeadingDeg;
-
-        // Normaliza para -180..180
-        while (angleError > 180) angleError -= 360;
-        while (angleError < -180) angleError += 360;
-
-        // Calcula potência do giro via PID
-        double turnPower = Range.clip(turnPID.calculate(0, -angleError), -0.5, 0.5);
-
-        // Aplica potência aos motores
         leftMotor.setPower(-turnPower);
         rightMotor.setPower(turnPower);
+
+        boolean aligned = Math.abs(yaw) < YAW_TOLERANCE && Math.abs(distance - TARGET_DISTANCE) < DISTANCE_TOLERANCE;
+
+        if(aligned) shooterCommand.execute(MathUtils.CalculateShooterPower(distance / 10));
+        else shooterCommand.end();
+
+        return aligned;
     }
 }
