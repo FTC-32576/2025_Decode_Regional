@@ -1,6 +1,7 @@
 package ftc.team.allmight.plusultra.teamcode.teleop;
 
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
+import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 import ftc.team.allmight.plusultra.teamcode.commands.ShooterCommand;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
 import ftc.team.allmight.plusultra.teamcode.subsystems.ShooterSubsystem;
@@ -13,6 +14,8 @@ import ftc.team.allmight.plusultra.teamcode.utils.FieldUtils;
 import ftc.team.allmight.plusultra.teamcode.utils.MathUtils;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -21,6 +24,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name = "RoboV1")
@@ -48,6 +52,10 @@ public class RobotV1 extends OpMode {
     private  Pose2d GOAL_POSE;
     private Alliance alliance = Alliance.RED;
 
+    private Limelight3A limelight3A;
+
+    LimeMight lime = new LimeMight(hardwareMap,"limelight", "imu", usbFacingDirection, logoFacingDirection, new PIDConfig(0.3, 0.001, 0.5), null);
+
     PIDConfig turnPIDConfig = new PIDConfig(0.03, 0.0, 0.002);
 
     @Override
@@ -59,7 +67,6 @@ public class RobotV1 extends OpMode {
         shooterSubsystem = new ShooterSubsystem(hardwareMap, "shooter", telemetry);
         shooterCommand = new ShooterCommand(shooterSubsystem);
         drive = new SampleTankDrive(hardwareMap);
-
 
         imu = new IMUMight(hardwareMap, "imu", RevHubOrientationOnRobot.UsbFacingDirection.UP, RevHubOrientationOnRobot.LogoFacingDirection.FORWARD);
 
@@ -73,7 +80,8 @@ public class RobotV1 extends OpMode {
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         GOAL_POSE = FieldUtils.getGoalPose(Alliance.BLUE);
-
+        //COLOCA O ROBO VIRADO PRA FRENTE  (OLHANDO PRO GOAL) NO CANTO INFERIOR ESQUERDO, SENAO NAO VAI FUNCIONAR!!!
+        drive.setPoseEstimate(new Pose2d(0,0, Math.toRadians(90)));
     }
 
     @Override
@@ -121,6 +129,7 @@ public class RobotV1 extends OpMode {
         drive.update();
 
 
+
     }
 
     public <T> T getHardware(Class<T> tipoDeHardware, String nome){
@@ -138,6 +147,8 @@ public class RobotV1 extends OpMode {
         telemetry.addData("Velocidade dos Motores", "Velocidade Esquerda: %s | Velocidade Direita %s", leftPower, rightPower);
         telemetry.update();
     }
+
+
 
 }
 

@@ -38,9 +38,7 @@ public class DetectPatternAuto extends LinearOpMode {
                 "imu",
                 RevHubOrientationOnRobot.UsbFacingDirection.UP,
                 RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
-                null,
-                null
-        );
+null,null);
 
         patternUtil = new AprilTagPatternUtil(limeMight);
         waitForStart();

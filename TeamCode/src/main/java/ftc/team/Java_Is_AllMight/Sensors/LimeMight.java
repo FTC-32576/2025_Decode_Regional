@@ -43,12 +43,12 @@ public class LimeMight {
                      RevHubOrientationOnRobot.UsbFacingDirection usbDir,
                      RevHubOrientationOnRobot.LogoFacingDirection logoDir,
                      PIDConfig pidAngle, PIDConfig pidDistance) {
+        this.pidDistance = pidDistance;
 
         this.limelight = hardwareMap.get(Limelight3A.class, cameraName);
         this.imu = new IMUMight(hardwareMap, imuName, usbDir, logoDir);
 
         this.pidAngle = pidAngle;
-        this.pidDistance = pidAngle;
     }
 
 
