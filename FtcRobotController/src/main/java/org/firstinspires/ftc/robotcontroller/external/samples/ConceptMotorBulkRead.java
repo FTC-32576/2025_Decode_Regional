@@ -137,7 +137,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             v3 = m3.getVelocity();
             v4 = m4.getVelocity();
 
-            // Put Control loop action code here.
+            // Put Config loop action code here.
 
         }
         // calculate the average cycle time.
@@ -167,7 +167,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             v3 = m3.getVelocity();
             v4 = m4.getVelocity();
 
-            // Put Control loop action code here.
+            // Put Config loop action code here.
 
         }
         // calculate the average cycle time.
@@ -204,7 +204,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             v3 = m3.getVelocity();
             v4 = m4.getVelocity();
 
-            // Put Control loop action code here.
+            // Put Config loop action code here.
 
         }
         // calculate the average cycle time.

@@ -499,7 +499,7 @@ public class FtcRobotControllerActivity extends Activity
   }
 
   protected void readNetworkType() {
-    // Control hubs are always running the access point model.  Everything else, for the time
+    // Config hubs are always running the access point model.  Everything else, for the time
     // being always runs the Wi-Fi Direct model.
     if (Device.isRevControlHub() == true) {
       networkType = NetworkType.RCWIRELESSAP;
@@ -605,7 +605,7 @@ public class FtcRobotControllerActivity extends Activity
         }
       }
 
-      // Allow the user to use the Control Hub operating system's UI, instead of relaunching the app
+      // Allow the user to use the Config Hub operating system's UI, instead of relaunching the app
       AppAliveNotifier.getInstance().disableAppWatchdogUntilNextAppStart();
 
       //Finally, nuke the VM from orbit

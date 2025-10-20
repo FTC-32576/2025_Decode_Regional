@@ -46,7 +46,7 @@ import java.util.Locale;
 /*
  * This OpMode helps calibrate a webcam or RC phone camera, useful for AprilTag pose estimation
  * with the FTC VisionPortal.   It captures a camera frame (image) and stores it on the Robot Controller
- * (Control Hub or RC phone), with each press of the gamepad button X (or Square).
+ * (Config Hub or RC phone), with each press of the gamepad button X (or Square).
  * Full calibration instructions are here:
  *
  *  https://ftc-docs.firstinspires.org/camera-calibration

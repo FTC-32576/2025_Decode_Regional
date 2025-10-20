@@ -56,8 +56,8 @@ import java.util.concurrent.TimeUnit;
  * The best way to run this optimization is to view the camera preview screen while changing the exposure and gains.
  *
  * To do this, you need to view the RobotController screen directly (not from Driver Station)
- * This can be done directly from a RC phone screen (if you are using an external Webcam), but for a Control Hub you must either plug an
- * HDMI monitor into the Control Hub HDMI port, or use an external viewer program like ScrCpy (https://scrcpy.org/)
+ * This can be done directly from a RC phone screen (if you are using an external Webcam), but for a Config Hub you must either plug an
+ * HDMI monitor into the Config Hub HDMI port, or use an external viewer program like ScrCpy (https://scrcpy.org/)
  *
  * Use Android Studio to Copy this Class, and Paste it into the TeamCode/src/main/java/org/firstinspires/ftc/teamcode folder.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.

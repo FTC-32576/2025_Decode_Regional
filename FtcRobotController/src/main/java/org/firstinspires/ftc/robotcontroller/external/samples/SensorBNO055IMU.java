@@ -48,7 +48,7 @@ import java.util.Locale;
 /*
  * This OpMode gives a short demo on how to use the BNO055 Inertial Motion Unit (IMU) from AdaFruit.
  *
- * Note: this is a Legacy example that will not work with newer Control/Expansion Hubs that use a different IMU
+ * Note: this is a Legacy example that will not work with newer Config/Expansion Hubs that use a different IMU
  * Please use the new SensorIMUOrthogonal or SensorIMUNonOrthogonal samples for a more universal IMU interface.
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.

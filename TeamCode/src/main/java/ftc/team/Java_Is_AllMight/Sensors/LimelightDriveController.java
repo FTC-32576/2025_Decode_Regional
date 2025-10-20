@@ -2,15 +2,16 @@ package ftc.team.Java_Is_AllMight.Sensors;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
-import ftc.team.Java_Is_AllMight.Control.PIDConfig;
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 
 public class LimelightDriveController {
 
-    private final LimelightHelper limelightHelper;
+    public final LimeMight limeMight;
     private final DcMotor leftMotor;
     private final DcMotor rightMotor;
 
@@ -38,14 +39,18 @@ public class LimelightDriveController {
                                     PIDConfig pidDistance,
                                     PIDConfig pidAngle,
                                     double maxPower) {
-        this.limelightHelper = new LimelightHelper(
+        this.limeMight = new LimeMight(
                 hardwareMap, cameraName, imuName, usbDir, logoDir, pidDistance, pidAngle
         );
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.maxPower = maxPower;
 
-        // Configuração inicial
+        this.leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         this.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -60,7 +65,7 @@ public class LimelightDriveController {
      * @return true if close enough
      */
     public boolean moveToPosition(double xTarget, double yTarget, double dtSeconds, Telemetry telemetry) {
-        double[] powers = limelightHelper.calculateMovementToPosition(xTarget, yTarget, dtSeconds);
+        double[] powers = limeMight.calculateMovementToPosition(xTarget, yTarget, dtSeconds);
 
         // Frente e rotação
         double forward = powers[0];
@@ -82,7 +87,7 @@ public class LimelightDriveController {
         }
 
         // Condição de parada (distância menor que 0.1m)
-        Pose3D pose = limelightHelper.getEstimatedFieldPosition();
+        Pose3D pose = limeMight.getEstimatedFieldPosition();
         if (pose == null) return false;
 
         double dx = xTarget - pose.getPosition().x;
@@ -104,6 +109,6 @@ public class LimelightDriveController {
 
     /** Telemetria completa do Limelight */
     public void telemetry(Telemetry telemetry) {
-        limelightHelper.telemetryFull(telemetry);
+        limeMight.telemetryFull(telemetry);
     }
 }

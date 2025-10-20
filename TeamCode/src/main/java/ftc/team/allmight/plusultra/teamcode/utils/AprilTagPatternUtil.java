@@ -6,18 +6,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.List;
 
-import ftc.team.Java_Is_AllMight.Sensors.LimelightHelper;
+import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 
 public class AprilTagPatternUtil {
 
-    private final LimelightHelper limelight;
+    private final LimeMight limelight;
     private Pattern detectedPattern = null; // Assume PPG
 
     public enum Pattern{
         PPG, PGP, GPP
     }
 
-    public AprilTagPatternUtil(LimelightHelper limelight) {
+    public AprilTagPatternUtil(LimeMight limelight) {
         this.limelight = limelight;
     }
 

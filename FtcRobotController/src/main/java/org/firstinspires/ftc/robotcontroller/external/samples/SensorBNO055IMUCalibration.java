@@ -48,7 +48,7 @@ import java.util.Locale;
  * This OpMode calibrates a BNO055 IMU per
  * "Section 3.11 Calibration" of the BNO055 specification.
  *
- *  Note: this is a Legacy example that will not work with newer Control/Expansion Hubs that use a different IMU
+ *  Note: this is a Legacy example that will not work with newer Config/Expansion Hubs that use a different IMU
  *  Please use the new SensorIMUOrthogonal or SensorIMUNonOrthogonal samples for a more universal IMU interface.
  *
  * Manual calibration of the IMU is definitely NOT necessary: except for the magnetometer (which is not used by the

@@ -13,17 +13,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
-import ftc.team.Java_Is_AllMight.Control.PIDConfig;
-import ftc.team.Java_Is_AllMight.Control.PIDController;
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
+import ftc.team.Java_Is_AllMight.Config.PIDController;
 
 
-public class LimelightHelper {
+public class LimeMight {
 
     // ==========================
     // VARIABLES
     // ==========================
     private final Limelight3A limelight;
-    private final IMUHelper imu;
+    private final IMUMight imu;
     private final PIDConfig pidDistance;
     private final PIDConfig pidAngle;
 
@@ -38,17 +38,17 @@ public class LimelightHelper {
     // CONSTRUCTOR
     // ==========================
 
-    public LimelightHelper(HardwareMap hardwareMap, String cameraName,
-                           String imuName,
-                           RevHubOrientationOnRobot.UsbFacingDirection usbDir,
-                           RevHubOrientationOnRobot.LogoFacingDirection logoDir,
-                           PIDConfig pidAngle, PIDConfig pidDistance) {
+    public LimeMight(HardwareMap hardwareMap, String cameraName,
+                     String imuName,
+                     RevHubOrientationOnRobot.UsbFacingDirection usbDir,
+                     RevHubOrientationOnRobot.LogoFacingDirection logoDir,
+                     PIDConfig pidAngle, PIDConfig pidDistance) {
+        this.pidDistance = pidDistance;
 
         this.limelight = hardwareMap.get(Limelight3A.class, cameraName);
-        this.imu = new IMUHelper(hardwareMap, imuName, usbDir, logoDir);
+        this.imu = new IMUMight(hardwareMap, imuName, usbDir, logoDir);
 
         this.pidAngle = pidAngle;
-        this.pidDistance = pidAngle;
     }
 
 
@@ -98,7 +98,7 @@ public class LimelightHelper {
         return null;
     }
 
-    /** Returns the distance to a given fiducial */
+    /** Returns the distance to a given fiducial In mm */
     public double getDistanceToFiducial(LLResultTypes.FiducialResult fiducial) {
         if (fiducial != null) {
             Pose3D robotPose = fiducial.getRobotPoseTargetSpace();
@@ -107,6 +107,19 @@ public class LimelightHelper {
                             robotPose.getPosition().y * robotPose.getPosition().y +
                             robotPose.getPosition().z * robotPose.getPosition().z
             );
+        }
+        return -1;
+    }
+
+    /** Returns the distance to a given fiducial In m */
+    public double getDistanceToFiducialinMeters(LLResultTypes.FiducialResult fiducial) {
+        if (fiducial != null) {
+            Pose3D robotPose = fiducial.getRobotPoseTargetSpace();
+            return Math.sqrt(
+                    robotPose.getPosition().x * robotPose.getPosition().x +
+                            robotPose.getPosition().y * robotPose.getPosition().y +
+                            robotPose.getPosition().z * robotPose.getPosition().z
+            ) /  1000.0;
         }
         return -1;
     }
@@ -245,7 +258,6 @@ public class LimelightHelper {
     public boolean updatePythonInputs(double[] inputs) {
         return limelight.updatePythonInputs(inputs);
     }
-
 
     // ==========================
     // PIPELINE METHODS

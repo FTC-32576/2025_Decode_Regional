@@ -52,7 +52,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  * This OpMode enables you to re-specify the Hub Mounting orientation dynamically by using gamepad controls.
  * While doing so, the sample will display how Pitch, Roll and Yaw angles change as the hub is moved.
  *
- * The gamepad controls let you change the two parameters that specify how the Control/Expansion Hub is mounted. <br>
+ * The gamepad controls let you change the two parameters that specify how the Config/Expansion Hub is mounted. <br>
  * The first parameter specifies which direction the printed logo on the Hub is pointing. <br>
  * The second parameter specifies which direction the USB connector on the Hub is pointing. <br>
  * All directions are relative to the robot, and left/right is as viewed from behind the robot.
