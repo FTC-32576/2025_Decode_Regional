@@ -48,7 +48,7 @@ TeamCode/
 │
 ├── Java_Is_AllMight/                # TeamLib — Reusable Library Code
 │   ├── Control/                     # PID control, motion logic, navigation
-│   ├── Sensors/                     # IMUHelper, LimelightHelper, and sensors
+│   ├── Sensors/                     # IMUMight, LimeMight, and sensors
 │   ├── Logging/                     # Logging and diagnostics
 │
 ├── allmight/plusultra/teamcode/     # Robot Code — Current Season
@@ -133,7 +133,7 @@ Team All Might maintains a **CI/CD (Continuous Integration / Continuous Deployme
   * Code style and documentation compliance
 
 * **🧪 Unit & Integration Tests:**
-  TeamLib components such as PIDController, IMUHelper, and LimelightHelper undergo simulation-based testing to validate their mathematical behavior.
+  TeamLib components such as PIDController, IMUMight, and LimeMight undergo simulation-based testing to validate their mathematical behavior.
 
 * **📦 Automated Deploy (optional):**
   When a stable build is tagged as a *release*, the pipeline automatically generates a signed `.apk` for the **Robot Controller (RC)**.
