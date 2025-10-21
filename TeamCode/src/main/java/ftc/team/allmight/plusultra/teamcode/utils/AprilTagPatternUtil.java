@@ -1,53 +1,51 @@
 package ftc.team.allmight.plusultra.teamcode.utils;
 
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.List;
 
-import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
-
 public class AprilTagPatternUtil {
 
-    private final LimeMight limelight;
-    private Pattern detectedPattern = null; // Assume PPG
+    private VisionPortal visionPortal;
+    private AprilTagProcessor aprilTag;
+    private Pattern detectedPattern = null;
 
-    public enum Pattern{
+    public enum Pattern {
         PPG, PGP, GPP
     }
 
-    public AprilTagPatternUtil(LimeMight limelight) {
-        this.limelight = limelight;
+    public AprilTagPatternUtil(VisionPortal visionPortal, AprilTagProcessor aprilTag) {
+        this.visionPortal = visionPortal;
+        this.aprilTag = aprilTag;
     }
 
-    public Pattern detectPattern(Telemetry telemetry){
+    public Pattern detectPattern(Telemetry telemetry) {
+        List<AprilTagDetection> detections = aprilTag.getDetections();
 
-        limelight.start();
-        List<LLResultTypes.FiducialResult> fiducials = limelight.getFiducials();
-
-        if (fiducials == null || fiducials.isEmpty()){
-            telemetry.addData("AprilTag Pattern", "Not detected"); telemetry.update();
+        if (detections == null || detections.isEmpty()) {
+            telemetry.addData("AprilTag Pattern", "Not detected");
+            telemetry.update();
             return null;
         }
 
-        int id = fiducials.get(0).getFiducialId();
+        int id = detections.get(0).id;
         switch (id) {
             case 23: detectedPattern = Pattern.PPG; break;
             case 22: detectedPattern = Pattern.PGP; break;
             case 21: detectedPattern = Pattern.GPP; break;
             default: detectedPattern = Pattern.PPG; break;
-        };
+        }
 
         telemetry.addData("AprilTag Pattern", detectedPattern);
         telemetry.update();
-        limelight.stop();
 
-        return null;
+        return detectedPattern;
     }
 
     public Pattern getDetectedPattern() {
         return detectedPattern;
     }
-
 }
