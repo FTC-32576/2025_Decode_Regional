@@ -90,7 +90,7 @@ public class RobotV1 extends OpMode {
         Pitch = imu.getPitch();
         Roll = imu.getRoll();
 
-        telemetry.addData("Atributos dasdao IMU", "Yaw: %s, Pitch %s, Roll %s", Heading, Pitch, Roll);
+        telemetry.addData("Atributos do IMU", "Yaw: %s, Pitch %s, Roll %s", Heading, Pitch, Roll);
         telemetry.update();
 
 
