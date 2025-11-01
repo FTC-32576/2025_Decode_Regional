@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class IMUMight {
@@ -80,6 +81,10 @@ public class IMUMight {
 
     public void update(){
         robotOrientation = imu.getRobotYawPitchRollAngles();
+    }
+
+    public AngularVelocity getAngularVelocity(){
+        return imu.getRobotAngularVelocity(AngleUnit.DEGREES);
     }
 
 }
