@@ -11,6 +11,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
+import ftc.team.Java_Is_AllMight.Pathing.PlusPathing;
+import ftc.team.Java_Is_AllMight.Pathing.PlusTrajectory;
+import ftc.team.Java_Is_AllMight.Pathing.PlusTrajectoryBuilder;
+import ftc.team.Java_Is_AllMight.Pathing.PlusTrajectoryFollower;
 import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -22,6 +27,16 @@ public class DetectPatternAuto extends LinearOpMode {
     private AprilTagPatternUtil patternUtil;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
+
+    private PlusPathing pathing = new PlusPathing(new PIDConfig(0,0,0), new PIDConfig(0,0,0));
+
+    private SampleTankDrive drive;
+    PlusTrajectory trajectory  = new PlusTrajectoryBuilder(drive.getPoseEstimate())
+            .toWaypoint(50,30, Math.toRadians(90))
+            .build();
+
+    PlusTrajectoryFollower follower = new PlusTrajectoryFollower(pathing);
+
 
     @Override
     public void runOpMode() {
@@ -36,7 +51,20 @@ public class DetectPatternAuto extends LinearOpMode {
 
         patternUtil = new AprilTagPatternUtil(visionPortal, aprilTag);
 
+        follower.follow(trajectory);
+
+        drive.update();
+
+        Pose2d pose = drive.getPoseEstimate();
+
+        PlusPathing.ControlOutput out = follower.update(pose);
+
         waitForStart();
+
+        double left = out.drive - out.turn;
+        double right = out.drive + out.turn;
+
+        drive.setMotorPowers(left, right);
 
         AprilTagPatternUtil.Pattern pattern = patternUtil.detectPattern(telemetry);
         telemetry.addData("Detected Pattern", pattern);
