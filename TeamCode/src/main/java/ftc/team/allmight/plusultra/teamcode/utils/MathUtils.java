@@ -51,23 +51,32 @@ public class MathUtils {
         double d = calcularDistanciaAteOGoal(dY, dX);
 
         // Ângulo do triângulo formado pelo robô e o goal
-        double arcoSeno = arcoSeno(dY, d);
+        double angleToGoal = arcoSeno(dY, d);
 
-        return new ResultadoMira(arcoSeno, d, heading);
+        return new ResultadoMira(angleToGoal, d, heading);
     }
 
     /**
      * Calcula a potência necessária do shooter com base na distância até o goal
      * Usa uma relação linear entre MIN_POWER e MAX_POWER
-     * @param distancia distância do robô até o goal em cm
+     * @param distanceMeters distância do robô até o goal em metros
      * @return potência entre 0 e 1
      */
-    public static double CalculateShooterPower(double distancia) {
-        // fórmula linear: MIN_POWER quando perto, MAX_POWER quando na distância máxima
-        double potencia = MIN_POWER + (distancia / MAX_DISTANCE) * (MAX_POWER - MIN_POWER);
+    public static double calculateShooterPower(double distanceMeters) {
+        // Intervalos calibráveis
+        double minDistance = 0.85;   // metros
+        double maxDistance = 2.3;   // metros
+        double minPower = 0.55;     // potência mínima
+        double maxPower = 1.00;     // potência máxima
 
-        // limita o valor entre 0 e 1 (segurança para o motor)
-        return Math.min(Math.max(potencia, 0), 1);
+        // Limita a distância ao range permitido
+        double clampedDistance = Math.max(minDistance, Math.min(distanceMeters, maxDistance));
+
+        // Interpolação linear (pode ser substituída por modelo físico depois)
+        double normalized = (clampedDistance - minDistance) / (maxDistance - minDistance);
+        double power = minPower + normalized * (maxPower - minPower);
+
+        return Math.min(Math.max(power, 0.0), 1.0);
     }
-
 }
+

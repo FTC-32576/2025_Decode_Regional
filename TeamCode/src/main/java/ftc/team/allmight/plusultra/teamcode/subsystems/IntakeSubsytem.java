@@ -31,7 +31,7 @@ public class IntakeSubsytem {
         this.telemetry = telemetry;
 
         intakeMotor = roboUtils.getHardware(hardwareMap, DcMotorEx.class, "intake");
-        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
     }
 
@@ -55,11 +55,11 @@ public class IntakeSubsytem {
     private void applyState(){
         switch (currentState){
             case INTAKE:
-                intakeMotor.setPower(0.9);
+                intakeMotor.setPower(-0.98);
                 break;
 
             case REVERSE:
-                intakeMotor.setPower(-0.9);
+                intakeMotor.setPower(0.98);
                 break;
 
             case STOP:

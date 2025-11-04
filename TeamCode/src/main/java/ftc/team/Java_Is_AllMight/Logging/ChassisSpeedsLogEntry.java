@@ -1,7 +1,10 @@
 package ftc.team.Java_Is_AllMight.Logging;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Disabled
 public class ChassisSpeedsLogEntry{
 
     protected final String name;

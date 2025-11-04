@@ -1,88 +1,109 @@
 package ftc.team.allmight.plusultra.teamcode.subsystems;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import ftc.team.Java_Is_AllMight.Config.PIDController;
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
+import ftc.team.Java_Is_AllMight.Config.PIDController;
+import ftc.team.Java_Is_AllMight.Utils.RoboUtils;
+import ftc.team.allmight.plusultra.teamcode.utils.MathUtils;
 
 public class ShooterSubsystem {
 
-    private final DcMotorEx shooterMotor;
-    private final PIDController shooterPID;
-    private final Telemetry telemetry;
+    // ---------- HARDWARE ----------
+    private DcMotorEx shooterMotor;
 
-    // Configuração PID (ajustar conforme seu motor)
-    public static PIDConfig pidConfig = new PIDConfig(0.005, 0, 0, 0.00021);
-    public static double TICKS_PER_REV = 28; // ticks por rotação do motor
+    // ---------- CONTROLE PID ----------
+    private PIDController pidController;
+    private PIDConfig pidConfig;
 
-    public double shooterTarget = 0;
-    private double offset = 0; // ajuste fino
+    // ---------- VARIÁVEIS ----------
+    private double targetVelocityTicks = 0;
+    private double lastRPM = 0;
+    private final ElapsedTime timer = new ElapsedTime();
 
-    public ShooterSubsystem(HardwareMap hardwareMap, String shooterName, Telemetry telemetry) {
-        this.telemetry = telemetry;
+    private static final double TICKS_PER_REV = 28.0;
+    private static final double DEFAULT_RPM = 6000.0;
 
-        shooterMotor = hardwareMap.get(DcMotorEx.class, shooterName);
-        shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+    private static RoboUtils roboUtils = new RoboUtils();
 
-        shooterPID = new PIDController(pidConfig);
+    // ---------- INICIALIZAÇÃO ----------
+    public void init(HardwareMap hardwareMap) {
+        shooterMotor = roboUtils.getHardware(hardwareMap, DcMotorEx.class, "intake");
+
+        pidConfig = new PIDConfig(
+                0.0008,  // kP
+                0.00002, // kI
+                0.0001,  // kD
+                0.00025  // kF
+        );
+
+        pidController = new PIDController(pidConfig);
+
+        shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        timer.reset();
     }
 
-    // Liga o shooter a potência fixa (teleop simples)
-    public void spin(double power) {
-        shooterMotor.setPower(power);
-        shooterTarget = 0; // desativa PID
-        shooterPID.reset();
+    // ---------- LOOP PRINCIPAL ----------
+    public void update(Telemetry telemetry) {
+        double currentVelocity = shooterMotor.getVelocity();
+        double pidOutput = pidController.calculate(targetVelocityTicks, currentVelocity);
+        pidOutput = Math.max(-1.0, Math.min(pidOutput, 1.0));
+//        shooterMotor.setPower(pidOutput);tui[´~çplokj
+
+        telemetry.addData("Shooter Power (PID)", pidOutput);
     }
 
-    // Liga o shooter para atingir RPM desejado
-    public void spinRPM(double rpm) {
-        shooterTarget = rpm;
+    public void updateShooterFromCamera(double distanceMeters, Telemetry telemetry) {
+        double power = MathUtils.calculateShooterPower(distanceMeters);
+
+        // shooterMotor.setPower(power); // desligado até ter o motor
+        telemetry.addData("Shooter Target Power", String.format("%.2f", power));
+        telemetry.addData("Distance (m)", String.format("%.2f", distanceMeters));
     }
 
-    // Para o shooter
+    public void shoot() {
+        setTargetVelocity(DEFAULT_RPM);
+    }
+
+
+    private void setTargetVelocity(double targetRPM) {
+        targetVelocityTicks = (targetRPM / 60.0) * TICKS_PER_REV;
+    }
+
+    public boolean isReadyToShoot() {
+        double currentRPM = ticksToRPM(shooterMotor.getVelocity());
+        double targetRPM = ticksToRPM(targetVelocityTicks);
+        double error = Math.abs(targetRPM - currentRPM);
+        boolean withinError = error < 50;
+        boolean stable = Math.abs(currentRPM - lastRPM) < 30;
+        lastRPM = currentRPM;
+        return withinError && stable;
+    }
+
+    private double ticksToRPM(double ticksPerSecond) {
+        return (ticksPerSecond / TICKS_PER_REV) * 60.0;
+    }
+
+    public double getCurrentRPM() {
+        return ticksToRPM(shooterMotor.getVelocity());
+    }
+
+    public double getPowerOutput() {
+        return shooterMotor.getPower();
+    }
+
+    // ---------- PARAR O SHOOTER ----------
     public void stop() {
-        shooterTarget = 0;
+        targetVelocityTicks = 0;
         shooterMotor.setPower(0);
-        shooterPID.reset();
-    }
-
-    // Ajuste fino do RPM durante a partida
-    public void adjustShooterRPM(double adjustment) {
-        offset += adjustment;
-    }
-
-    // Atualizar PID e aplicar potência — chamar a cada ciclo
-    public void update() {
-        if (shooterTarget > 0) {
-            double currentRPM = getShooterRPM();
-            double power = shooterPID.calculate(shooterTarget + offset, currentRPM);
-            shooterMotor.setPower(power);
-        }
-
-        // Telemetria básica para debug
-        telemetry.addData("Shooter RPM", getShooterRPM());
-        telemetry.addData("Shooter Setpoint", shooterTarget + offset);
-        telemetry.addData("Shooter Power", shooterMotor.getPower());
-        telemetry.update();
-    }
-
-    // Retorna RPM atual do motor
-    public double getShooterRPM() {
-        return 60.0 * (shooterMotor.getVelocity() / TICKS_PER_REV);
-    }
-
-    // Retorna se o shooter está dentro da tolerância
-    public boolean atSetpoint() {
-        return Math.abs(shooterTarget + offset - getShooterRPM()) < 50; // ±50 RPM
-    }
-
-    // Permite inverter direção do motor se necessário
-    public void setDirection(DcMotorSimple.Direction direction) {
-        shooterMotor.setDirection(direction);
+        pidController.reset();
     }
 }

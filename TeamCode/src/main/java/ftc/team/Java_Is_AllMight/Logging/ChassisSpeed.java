@@ -1,5 +1,8 @@
 package ftc.team.Java_Is_AllMight.Logging;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
+@Disabled
 public class ChassisSpeed {
     public double vx, vy, omega;
 

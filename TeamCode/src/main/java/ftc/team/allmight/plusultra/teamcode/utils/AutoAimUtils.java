@@ -7,9 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
+import ftc.team.Java_Is_AllMight.Sensors.AprilTagWebcam;
 import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 import ftc.team.Java_Is_AllMight.Utils.Alliance;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
@@ -36,6 +38,7 @@ public class AutoAimUtils {
     // Métodoo: tenta mirar usando Limelight e odometria
 
     public static boolean aimAjust(LimeMight lime,
+                                   AprilTagWebcam webcam,
                                    Alliance alliance,
                                    SampleTankDrive drive,
                                    DcMotor leftMotor,
@@ -46,6 +49,12 @@ public class AutoAimUtils {
         if(leftMotor == null || rightMotor == null || alliance == null)
             return false;
 
+        webcam.update();
+        AprilTagDetection tag = webcam.getTagBySpecificId(alliance.getTagID());
+
+        if (tag != null){
+            return aimWithWebcam(webcam, tag, leftMotor, rightMotor, pidConfig,maxPower);
+        }
         //  Tenta usar Limelight, se tiver
         FiducialResult fid = getTargetFiducial(lime, alliance);
         if(fid != null) {
@@ -157,6 +166,30 @@ public class AutoAimUtils {
         boolean alignedYaw = Math.abs(yaw) < YAW_TOLERANCE;
         return alignedYaw;
     }
+
+    private static boolean aimWithWebcam(
+            AprilTagWebcam webcam,
+            AprilTagDetection tag,
+            DcMotor leftMotor,
+            DcMotor rightMotor,
+            PIDConfig pidConfig,
+            double maxPower) {
+
+        PIDController turnPID = new PIDController(pidConfig);
+
+        // Yaw (graus) é a rotação lateral da câmera em relação à tag
+        double yaw = tag.ftcPose.yaw; // já em graus
+        double distance = tag.ftcPose.range; // distância em cm
+
+        double turnPower = Range.clip(turnPID.calculate(0, yaw), -maxPower, maxPower);
+
+        leftMotor.setPower(-turnPower);
+        rightMotor.setPower(turnPower);
+
+        boolean alignedYaw = Math.abs(yaw) < YAW_TOLERANCE;
+        return alignedYaw;
+    }
+
 
 
     /** Mira usando apenas a pose estimada (odometria / RoadRunner) */
