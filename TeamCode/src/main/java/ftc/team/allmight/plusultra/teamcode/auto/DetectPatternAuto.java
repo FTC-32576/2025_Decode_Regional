@@ -26,7 +26,7 @@ public class DetectPatternAuto extends LinearOpMode {
 
     private AprilTagProcessor aprilTagProcessor;
 
-//    private Servo servo;
+    private Servo servo;
 
     private Alliance alliance = Alliance.RED;
 
@@ -36,7 +36,7 @@ public class DetectPatternAuto extends LinearOpMode {
     public void runOpMode() {
         SampleTankDrive drive = new SampleTankDrive(hardwareMap);
 
-//        servo = hardwareMap.get(Servo.class, "servidor");
+        servo = hardwareMap.get(Servo.class, "servidor");
 
 
         aprilTagWebcam.init(hardwareMap, telemetry);
@@ -80,18 +80,11 @@ public class DetectPatternAuto extends LinearOpMode {
             pattern = patternUtil.detectPattern(telemetry);
 
 
-
-
-
-
-
-
-
-//            if(gamepad1.a){
-//                servo.setPosition(1.0);
-//            } else if (gamepad1.b) {
-//                servo.setPosition(0.0);
-//            }
+            if(gamepad1.a){
+                servo.setPosition(1.0);
+            } else if (gamepad1.b) {
+                servo.setPosition(0.0);
+            }
 
         }
     }

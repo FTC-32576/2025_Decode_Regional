@@ -18,7 +18,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @TeleOp(name = "RoboV1")
 public class RobotV1 extends OpMode {
@@ -31,6 +34,7 @@ public class RobotV1 extends OpMode {
 
     private AimState aimState = AimState.DRIVING;
 
+    public Servo servo;
     private DcMotor leftMotor, rightMotor;
     private IntakeSubsytem intakeMotor;
     private ShooterSubsystem shooterSubsystem;
@@ -47,9 +51,10 @@ public class RobotV1 extends OpMode {
     @Override
     public void init() {
         chassisLogger = new CustomChassisSpeedsLogger("ChassiLogger", telemetry);
-//        leftMotor = roboUtils.getHardware(hardwareMap, DcMotor.class, "motorEsquerdo");
-//        rightMotor = roboUtils.getHardware(hardwareMap, DcMotor.class, "motorDireito");
+        leftMotor = roboUtils.getHardware(hardwareMap, DcMotor.class, "motorEsquerdo");
+        rightMotor = roboUtils.getHardware(hardwareMap, DcMotor.class, "motorDireito");
         intakeMotor = new IntakeSubsytem(hardwareMap, telemetry);
+        servo = hardwareMap.get(Servo.class, "servidor");
 
         shooterSubsystem = new ShooterSubsystem();
         shooterSubsystem.init(hardwareMap);
@@ -73,55 +78,96 @@ public class RobotV1 extends OpMode {
     @Override
     public void loop() {
         imu.update();
-        drive.update();
+//        drive.update();
+//
+//        if(gamepad1.left_bumper) intakeMotor.intake(); else if(gamepad1.right_bumper) intakeMotor.reverse(); else intakeMotor.stop();
+//        intakeMotor.update();
+//
+//        boolean shooterButton = gamepad1.right_trigger > 0.1;
+//
+//        if(shooterButton) shooterSubsystem.shoot(); else shooterSubsystem.stop(); //RPM
+//        boolean aimingButton = gamepad1.a;
+//
+//        shooterSubsystem.update(telemetry);
+//
+//        switch (aimState) {
+//
+//            case DRIVING:
+//                driveManual();
+//                if (aimingButton) {
+//                    aimState = AimState.AIMING;
+//                }
+//                break;
+//
+//            case AIMING:
+//                pararMotores();
+//
+//                boolean aligned = AutoAimUtils.aimAjust(
+//                        null, null, alliance, drive,
+//                        leftMotor, rightMotor,
+//                        turnPIDConfig, 0.5
+//                );
+//
+//                if (aligned) aimState = AimState.AIMED;
+//                if (!aimingButton) aimState = AimState.DRIVING;
+//                break;
+//
+//            case AIMED:
+//                pararMotores();
+//                telemetry.addLine("Alinhado");
+//
+//                if(shooterSubsystem.isReadyToShoot()){
+//                    telemetry.addLine("Ta pronto pra shoot");
+//                } else{
+//                    telemetry.addLine("Alinhando");
+//                }
+//                if (!aimingButton) aimState = AimState.DRIVING;
+//                break;
+//        }
+//
+//        controlarIntake();
+//        mostrarTelemetry();
 
-        if(gamepad1.left_bumper) intakeMotor.intake(); else if(gamepad1.right_bumper) intakeMotor.reverse(); else intakeMotor.stop();
-        intakeMotor.update();
+//        intake.update();
+//
+//        telemetry.addData("Corrente", shooter.getCurrent(CurrentUnit.AMPS));
+//        telemetry.addLine(String.valueOf(servo.getPosition()));
+//        telemetry.addLine(servo.getDirection().toString());
+//        if(gamepad1.right_bumper){
+////            shooter.shoot();
+//            shooter.setPower(1);
+//
+//        } else if(gamepad1.left_bumper){
+////            shooter.stop();
+//            shooter.setPower(0);
+//        }
+//
+//        if(gamepad1.y){
+//            controlarServo(0.0);
+//
+//        }else if (gamepad1.x) {
+//            controlarServo(0.5);
+//        }
+//
+//        if(gamepad1.right_trigger > 0.1){
+//            intake.intake();
+//        } else {
+//            intake.stop();
+//        }
 
-        boolean shooterButton = gamepad1.right_trigger > 0.1;
 
-        if(shooterButton) shooterSubsystem.shoot(); else shooterSubsystem.stop(); //RPM
-        boolean aimingButton = gamepad1.a;
+        telemetry.update();
+    }
 
-        shooterSubsystem.update(telemetry);
+    public void controlarServo(double direcao){
+        if(direcao == 0.0){
+            servo.setDirection(Servo.Direction.FORWARD);
+            servo.setPosition(direcao);
+        } else if (direcao == 0.5) {
+            servo.setDirection(Servo.Direction.FORWARD);
+            servo.setPosition(direcao);
 
-        switch (aimState) {
-
-            case DRIVING:
-                driveManual();
-                if (aimingButton) {
-                    aimState = AimState.AIMING;
-                }
-                break;
-
-            case AIMING:
-                pararMotores();
-
-                boolean aligned = AutoAimUtils.aimAjust(
-                        null, null, alliance, drive,
-                        leftMotor, rightMotor,
-                        turnPIDConfig, 0.5
-                );
-
-                if (aligned) aimState = AimState.AIMED;
-                if (!aimingButton) aimState = AimState.DRIVING;
-                break;
-
-            case AIMED:
-                pararMotores();
-                telemetry.addLine("Alinhado");
-
-                if(shooterSubsystem.isReadyToShoot()){
-                    telemetry.addLine("Ta pronto pra shoot");
-                } else{
-                    telemetry.addLine("Alinhando");
-                }
-                if (!aimingButton) aimState = AimState.DRIVING;
-                break;
         }
-
-        controlarIntake();
-        mostrarTelemetry();
     }
 
     private void driveManual() {
