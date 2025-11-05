@@ -32,9 +32,10 @@ public class DetectPatternAuto extends LinearOpMode {
 
     AprilTagWebcam aprilTagWebcam  = new AprilTagWebcam();
 
+    private SampleTankDrive drive;
     @Override
     public void runOpMode() {
-        SampleTankDrive drive = new SampleTankDrive(hardwareMap);
+        drive = new SampleTankDrive(hardwareMap);
 
         servo = hardwareMap.get(Servo.class, "servidor");
 

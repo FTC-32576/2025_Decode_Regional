@@ -12,9 +12,9 @@ import ftc.team.Java_Is_AllMight.Utils.RoboUtils;
 public class IntakeSubsytem {
 
     // Estados possíveis do intake durante a partida
-    // INTAKE: puxar pixel/nota para dentro
+    // INTAKE: puxar artefato para dentro
     // STOP: parar motor e não consumir energia
-    // REVERSE: cuspir/expelir pixel para liberar entupimento
+    // REVERSE: cuspir/expelir artefato para liberar entupimento
     public enum IntakeState{
         INTAKE,
         STOP,
