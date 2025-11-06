@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+import ftc.team.Java_Is_AllMight.Config.PIDConfig;
+import ftc.team.Java_Is_AllMight.Config.PIDController;
 import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
 import ftc.team.Java_Is_AllMight.Utils.RoboUtils;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
@@ -31,8 +33,22 @@ public class ShooterTest extends OpMode {
 
     private SampleTankDrive odometryTank;
 
-    boolean shooterOn = false;
-    boolean lastRB = false;
+    private static final double TICKS_PER_REV = 28.0;
+    private static final double GEARS = 25.0 / 10.0;
+
+
+    private PIDConfig pidShooterSettings = new PIDConfig(
+//            0.0008,
+//            0.00002,
+//            0.0001
+            0.00038,
+            0.000001,
+            0.0001
+    );
+
+    private PIDController pidShooter = new PIDController(pidShooterSettings);
+
+    private static final double potenciaAlvo = 660;
 
     @Override
     public void init() {
@@ -66,21 +82,39 @@ public class ShooterTest extends OpMode {
         intake.update();
 
         // Shooter Power / Start / Stop
-        // Detectar clique (toggle)
-        if (gamepad2.right_bumper && !lastRB) {
-            shooterOn = !shooterOn;   // Alterna entre ligado/desligado
-        }
-        lastRB = gamepad2.right_bumper;
+//        if (gamepad2.right_bumper) {
+//            double targetRpm = 3200;          // RPM desejado da saída
+//            double targetRpmMotor  = targetRpm / GEARS;  // RPM no motor
+//
+//            double ticksPerSecond = rpmToTicksPerSecond(targetRpmMotor);
+//            shooter.getVelocity();
+//            shooter.setPower(0.2548);
+//            pidShooter.calculate(setpoint,measurement);
+////            shooter.setVelocity(ticksPerSecond);
+//        }
+//        if (gamepad2.left_bumper) shooter.setVelocity(0);
 
-        // Reverse segurando o left bumper
+        if (gamepad2.right_bumper) {
+
+            double velocidadeAtual = shooter.getVelocity();   // ticks/seg atual
+            double velocidadeAlvo = potenciaAlvo;             // já veio como 660 (ticks/s)
+
+            double erro = velocidadeAlvo - velocidadeAtual;
+
+            double pidOutput = pidShooter.calculate(velocidadeAlvo, velocidadeAtual);
+
+            // Ajuste final de potência
+            double potencia = Range.clip(pidOutput, 0, 1);
+
+            shooter.setPower(potencia);
+
+            telemetry.addData("PID Output", pidOutput);
+            telemetry.addData("Erro", erro);
+            telemetry.addData("Potência final", potencia);
+        }
+
         if (gamepad2.left_bumper) {
-            shooter.setPower(-0.65);
-        }
-        else if (shooterOn) {
-            shooter.setPower(0.65);
-        }
-        else {
-            shooter.setPower(0.0);
+            shooter.setPower(0);
         }
 
         // Servo -> posições fixas
@@ -91,6 +125,7 @@ public class ShooterTest extends OpMode {
         }
 
 
+
         // Drive
         drive.drive(
                 -gamepad1.left_stick_y,
@@ -98,6 +133,11 @@ public class ShooterTest extends OpMode {
         );
 
         telemetry.addData("Servo Pos", servo.getPosition());
+        telemetry.addData("Velocidade do Shooter", shooter.getVelocity());
         telemetry.update();
+    }
+
+    public double rpmToTicksPerSecond(double rpm) {
+        return (rpm / 60.0) * TICKS_PER_REV;
     }
 }
