@@ -31,6 +31,9 @@ public class ShooterTest extends OpMode {
 
     private SampleTankDrive odometryTank;
 
+    boolean shooterOn = false;
+    boolean lastRB = false;
+
     @Override
     public void init() {
 //        shooter = new ShooterSubsystem();
@@ -63,8 +66,22 @@ public class ShooterTest extends OpMode {
         intake.update();
 
         // Shooter Power / Start / Stop
-        if (gamepad2.right_bumper) shooter.setPower(0.65);
-        if (gamepad2.left_bumper) shooter.setPower(0);
+        // Detectar clique (toggle)
+        if (gamepad2.right_bumper && !lastRB) {
+            shooterOn = !shooterOn;   // Alterna entre ligado/desligado
+        }
+        lastRB = gamepad2.right_bumper;
+
+        // Reverse segurando o left bumper
+        if (gamepad2.left_bumper) {
+            shooter.setPower(-0.65);
+        }
+        else if (shooterOn) {
+            shooter.setPower(0.65);
+        }
+        else {
+            shooter.setPower(0.0);
+        }
 
         // Servo -> posições fixas
         if (gamepad2.x) {
