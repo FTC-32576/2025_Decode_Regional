@@ -34,21 +34,21 @@ public class ShooterTest extends OpMode {
     private SampleTankDrive odometryTank;
 
     private static final double TICKS_PER_REV = 28.0;
-    private static final double GEARS = 25.0 / 10.0;
+    private static final double GEARS = 25.0 / 20.0;
 
 
     private PIDConfig pidShooterSettings = new PIDConfig(
 //            0.0008,
 //            0.00002,
 //            0.0001
-            0.00038,
-            0.000001,
-            0.0001
+            0.0004001,
+            0.00000,
+            0.00001
     );
 
     private PIDController pidShooter = new PIDController(pidShooterSettings);
 
-    private static final double potenciaAlvo = 660;
+    private static final double potenciaAlvo = 1300.444;
 
     @Override
     public void init() {
@@ -104,13 +104,15 @@ public class ShooterTest extends OpMode {
             double pidOutput = pidShooter.calculate(velocidadeAlvo, velocidadeAtual);
 
             // Ajuste final de potência
-            double potencia = Range.clip(pidOutput, 0, 1);
+            double potencia = Range.clip(pidOutput, -1, 1);
 
             shooter.setPower(potencia);
 
-            telemetry.addData("PID Output", pidOutput);
-            telemetry.addData("Erro", erro);
-            telemetry.addData("Potência final", potencia);
+
+
+//            telemetry.addData("PID Output", pidOutput);
+//            telemetry.addData("Erro", erro);
+//            telemetry.addData("Potência final", potencia);
         }
 
         if (gamepad2.left_bumper) {
@@ -134,6 +136,7 @@ public class ShooterTest extends OpMode {
 
         telemetry.addData("Servo Pos", servo.getPosition());
         telemetry.addData("Velocidade do Shooter", shooter.getVelocity());
+
         telemetry.update();
     }
 
