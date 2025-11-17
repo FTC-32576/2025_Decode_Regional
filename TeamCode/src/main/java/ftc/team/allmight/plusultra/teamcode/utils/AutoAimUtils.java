@@ -11,7 +11,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-import ftc.team.Java_Is_AllMight.Sensors.AprilTagWebcam;
+import ftc.team.Java_Is_AllMight.Sensors.CameraMight;
 import ftc.team.Java_Is_AllMight.Sensors.LimeMight;
 import ftc.team.Java_Is_AllMight.Utils.Alliance;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
@@ -38,7 +38,7 @@ public class AutoAimUtils {
     // Métodoo: tenta mirar usando Limelight e odometria
 
     public static boolean aimAjust(LimeMight lime,
-                                   AprilTagWebcam webcam,
+                                   CameraMight webcam,
                                    Alliance alliance,
                                    SampleTankDrive drive,
                                    DcMotor leftMotor,
@@ -168,7 +168,7 @@ public class AutoAimUtils {
     }
 
     private static boolean aimWithWebcam(
-            AprilTagWebcam webcam,
+            CameraMight webcam,
             AprilTagDetection tag,
             DcMotor leftMotor,
             DcMotor rightMotor,

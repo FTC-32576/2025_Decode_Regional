@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
@@ -17,6 +18,7 @@ import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
 import ftc.team.Java_Is_AllMight.Utils.RoboUtils;
 import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
 import ftc.team.allmight.plusultra.teamcode.subsystems.Drive;
+import ftc.team.allmight.plusultra.teamcode.subsystems.DriveAcel;
 import ftc.team.allmight.plusultra.teamcode.subsystems.IntakeSubsytem;
 import ftc.team.allmight.plusultra.teamcode.subsystems.ServoSubsystem;
 import ftc.team.allmight.plusultra.teamcode.subsystems.ShooterSubsystem;
@@ -29,7 +31,7 @@ public class ShooterTest extends OpMode {
 
     private IntakeSubsytem intake;
     private ServoSubsystem servo;
-    private Drive drive;
+    private DriveAcel drive;
 
     private SampleTankDrive odometryTank;
 
@@ -41,14 +43,14 @@ public class ShooterTest extends OpMode {
 //            0.0008,
 //            0.00002,
 //            0.0001
-            0.0004001,
-            0.00000,
-            0.00001
+            0.000765,  // P
+            0.00000,       // I
+            0.000000     // D
     );
 
     private PIDController pidShooter = new PIDController(pidShooterSettings);
 
-    private static final double potenciaAlvo = 1300.444;
+    private static final double potenciaAlvo = 900;
 
     @Override
     public void init() {
@@ -56,12 +58,11 @@ public class ShooterTest extends OpMode {
 //        shooter.init(hardwareMap);
 
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-
         intake = new IntakeSubsytem(hardwareMap, telemetry);
         servo = new ServoSubsystem(hardwareMap);
-        drive = new Drive(hardwareMap);
+        drive = new DriveAcel(hardwareMap);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         odometryTank = new SampleTankDrive(hardwareMap);
     }
 
@@ -108,8 +109,6 @@ public class ShooterTest extends OpMode {
 
             shooter.setPower(potencia);
 
-
-
 //            telemetry.addData("PID Output", pidOutput);
 //            telemetry.addData("Erro", erro);
 //            telemetry.addData("Potência final", potencia);
@@ -131,8 +130,10 @@ public class ShooterTest extends OpMode {
         // Drive
         drive.drive(
                 -gamepad1.left_stick_y,
-                gamepad1.right_stick_x
+                gamepad1.right_stick_x,
+                gamepad1.right_stick_y
         );
+
 
         telemetry.addData("Servo Pos", servo.getPosition());
         telemetry.addData("Velocidade do Shooter", shooter.getVelocity());

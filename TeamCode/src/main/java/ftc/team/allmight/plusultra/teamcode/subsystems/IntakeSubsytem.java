@@ -35,12 +35,12 @@ public class IntakeSubsytem {
 
     }
 
-    // Intenção: puxar peça
+    // Intenção: puxar artefato
     public void intake(){
         currentState = IntakeState.INTAKE;
     }
 
-    // Intenção: expelir peça
+    // Intenção: expelir artwefato
     public void reverse(){
         currentState = IntakeState.REVERSE;
     }
@@ -54,18 +54,9 @@ public class IntakeSubsytem {
 
     private void applyState(){
         switch (currentState){
-            case INTAKE:
-                intakeMotor.setPower(-0.98);
-                break;
-
-            case REVERSE:
-                intakeMotor.setPower(0.98);
-                break;
-
-            case STOP:
-            default:
-                intakeMotor.setPower(0.0);
-                break;
+            case INTAKE: intakeMotor.setPower(-0.98); break;
+            case REVERSE: intakeMotor.setPower(0.98); break;
+            case STOP: default: intakeMotor.setPower(0.0); break;
         }
     }
 
@@ -77,6 +68,10 @@ public class IntakeSubsytem {
         telemetry.addData("Intake Current (A)", intakeMotor.getCurrent(CurrentUnit.AMPS));
 //        telemetry.update();
 
+    }
+
+    public boolean intakeIsBusy(){
+        return intakeMotor.isBusy();
     }
 
 }

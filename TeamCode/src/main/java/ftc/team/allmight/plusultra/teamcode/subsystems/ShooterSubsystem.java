@@ -41,14 +41,13 @@ public class ShooterSubsystem {
     // ===== Constantes =====
     private static final double TICKS_PER_REV = 28.0; // encoder do motor REV
     private static final double GEAR_RATIO = 10.0 / 25.0;
-    // saída/entrada: flywheelRPM = motorRPM * 0.4
 
     private static final double READY_ERROR_RPM = 40;  // margem de erro aceitável
     private static final double STABLE_DELTA_RPM = 25; // variação máxima para ser considerado estável
 
-    // ================================================================
+
     // INIT
-    // ================================================================
+
     public void init(HardwareMap hardwareMap) {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
 
@@ -64,43 +63,22 @@ public class ShooterSubsystem {
         shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
-
-    // ================================================================
     // UPDATE
-    // ================================================================
+
     public void update(Telemetry telemetry) {
         double ticksPerSecond = shooterMotor.getVelocity();
         double shooterRPM = ticksToShooterRPM(ticksPerSecond);
 
         switch (currentState) {
 
-            case OFF:
-                shooterMotor.setPower(0);
-                pid.reset();
-                break;
-
-            case SPINUP_RPM:
-                double pidOutput = pid.calculate(targetVelocityTicks, ticksPerSecond);
-                shooterMotor.setPower(clamp(pidOutput, 0, 1));
-
-                if (isReady(shooterRPM)) {
-                    currentState = ShooterState.READY;
-                }
-                break;
+            case OFF: shooterMotor.setPower(0); pid.reset(); break;
 
             case SPINUP_POWER:
-                shooterMotor.setPower(manualPower);
-
-                if (isReady(shooterRPM)) {
-                    currentState = ShooterState.READY;
-                }
+                shooterMotor.setPower(manualPower); if (isReady(shooterRPM)) {currentState = ShooterState.READY;}
                 break;
 
-            case READY:
-            case HOLD:
-                double hold = pid.calculate(targetVelocityTicks, ticksPerSecond);
-                shooterMotor.setPower(clamp(hold, 0, 1));
-                break;
+            case READY: double hold = pid.calculate(targetVelocityTicks, ticksPerSecond);
+            shooterMotor.setPower(clamp(hold, 0, 1));break;
         }
 
         telemetry.addData("Shooter State", currentState);
@@ -111,9 +89,7 @@ public class ShooterSubsystem {
         lastShooterRPM = shooterRPM;
     }
 
-    // ================================================================
     // MÉTODOS DE CONTROLE DO SHOOTER
-    // ================================================================
 
     public void setRPM(double shooterRPM) {
         this.targetShooterRPM = shooterRPM;
@@ -147,9 +123,9 @@ public class ShooterSubsystem {
         return currentState == ShooterState.READY || currentState == ShooterState.HOLD;
     }
 
-    // ================================================================
+
     // FUNÇÕES INTERNAS
-    // ================================================================
+
     private boolean isReady(double shooterRPM) {
         double error = Math.abs(targetShooterRPM - shooterRPM);
         boolean withinError = error < READY_ERROR_RPM;
