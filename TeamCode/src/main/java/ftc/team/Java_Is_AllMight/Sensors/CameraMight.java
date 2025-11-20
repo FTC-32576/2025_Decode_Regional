@@ -207,9 +207,9 @@ public class CameraMight {
 
     public void alignCenterTag(Drive drive, int id, LinearOpMode opMode) {
 
-        double tolerance = 1.5;   // erro aceitável
+        double tolerance = 0.5;   // erro aceitável
         double kp = 0.03;         // ganho proporcional
-        double minPower = 0.08;   // potência mínima para conseguir girar
+        double minPower = 0.1;   // potência mínima para conseguir girar
         long timeout = System.currentTimeMillis() + 2500; // timeout de segurança
 
         while (opMode.opModeIsActive() && System.currentTimeMillis() < timeout) {

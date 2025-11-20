@@ -54,8 +54,8 @@ public class IntakeSubsytem {
 
     private void applyState(){
         switch (currentState){
-            case INTAKE: intakeMotor.setPower(-0.98); break;
-            case REVERSE: intakeMotor.setPower(0.98); break;
+            case INTAKE: intakeMotor.setPower(-1); break;
+            case REVERSE: intakeMotor.setPower(1); break;
             case STOP: default: intakeMotor.setPower(0.0); break;
         }
     }

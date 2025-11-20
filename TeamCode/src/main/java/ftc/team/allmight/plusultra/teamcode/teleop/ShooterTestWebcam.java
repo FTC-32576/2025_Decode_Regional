@@ -40,8 +40,8 @@
         private PIDController pidShooter = new PIDController(pidShooterSettings);
 
         // ===== LINEAR =====
-        private static final double M = 330.8306010928962;
-        private static final double B = 543.551912568306;
+        private static final double M = 380.8306010928962;
+        private static final double B = 554.551912568306;
         private double filteredTarget = 0.0;
         private static final double ALPHA = 0.25;
 

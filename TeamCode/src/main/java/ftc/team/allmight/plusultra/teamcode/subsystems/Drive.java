@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.Java_Is_AllMight.Config.PIDController;
 import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
+import ftc.team.Java_Is_AllMight.Utils.Alliance;
 
 public class Drive {
 
@@ -17,6 +18,7 @@ public class Drive {
     public final DcMotor rightMotor;
     private final IMUMight imu;
 
+    private Alliance alliance = Alliance.RED;
     private static final double TICKS_PER_REV = 560.0;
     private static final double WHEEL_DIAMETER_CM = 9.0;
     private static final double WHEEL_CIRCUMFERENCE_CM = Math.PI * WHEEL_DIAMETER_CM;
@@ -24,11 +26,19 @@ public class Drive {
     private static final double CM_PER_TICK = WHEEL_CIRCUMFERENCE_CM / TICKS_PER_REV;
 
 
+    private final PIDController straightP = new PIDController(
+            new PIDConfig(
+                    0.02,  // kP
+                    0.0,   // kI
+                    0.0    // kD
+            )
+    );
+
     private final PIDController turnPID = new PIDController(
             new PIDConfig(
-                    0.1,   // kP
-                    0.00001,  // kI
-                    0.0005, // kD
+                    0.075,   // kP
+                    0.0000,  // kI
+                    0.0003, // kD
                     0.0,    // kF
                     10      // iZone (10°)
             )
@@ -96,9 +106,9 @@ public class Drive {
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        double minPower = 0.12;      // evita morto
-        double accelRate = 0.02;     // aceleração por loop
-        double decelStart = 0.7;     // quando começar a desacelerar (%)
+        double minPower = 0.2;      // evita morto
+        double accelRate = 0.3;     // aceleração por loop
+        double decelStart = 0.85;     // quando começar a desacelerar (%)
 
         double power = minPower;
 
@@ -133,6 +143,8 @@ public class Drive {
 
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        degrees = this.alliance == Alliance.RED ? degrees : -degrees;
 
         imu.update();
         double start = imu.getYaw();
@@ -198,6 +210,10 @@ public class Drive {
 
         async_maxPower = maxPower;
         async_active = true;
+    }
+
+    public void defineAlliance(Alliance alliance){
+        this.alliance = alliance;
     }
 
 
