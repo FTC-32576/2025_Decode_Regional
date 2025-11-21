@@ -53,10 +53,12 @@ public class BlueAuto extends LinearOpMode {
     // estabilidade (ticks)
     private static final double STABLE_THRESHOLD = 50.0;
 
+    private Alliance alliance = Alliance.BLUE;
     public enum shootNumber{
         START(),
         DEPOIS()
     }
+
 
 
     @Override
@@ -92,36 +94,22 @@ public class BlueAuto extends LinearOpMode {
         servo.setPosition(0.0); //servo pro 0
 
         // Shooter começa acelerando para uma velocidade segura enquanto ainda não tem tag
-        double preBoost = 0.8; // Ajuste conforme seu robô
+        double preBoost = 0.9162; // Ajuste conforme seu robô
         shooter.setPower(preBoost);
         filteredTarget = preBoost;  // Começa o filtro daqui
 
+        drive.moveSmooth(32.576, 0.6);
+        drive.turnIMU(32.576, 0.32576, 1, telemetry);
 
+        shootar(4,0.4, 0.0, shooter, servo, alliance, shootNumber.START);
 
+        drive.turnIMU(-32.576, 0.32576, 1, telemetry);
+        drive.moveSmooth(32.576, 0.9162);
+        drive.turnIMU(90, 0.32576, 1, telemetry);
 
-        //        for (int i = 0; i < 10 && opModeIsActive(); i++) {
-        //            double erro = adjustShooterPower(shooter, Alliance.RED);
-        //            if (erro < STABLE_THRESHOLD) break;
-        //        }
-
-
-
-        drive.moveSmooth(-135, 1); // ir pra ponta do triangulo grande
-
-
-        shootar(5, 0.45678901, 0, shooter, servo, Alliance.RED, shootNumber.START); // shootar 3 bolas + 1 por segurança
-
-        drive.turnIMU(50, 0.35, 1, telemetry); // girar pra ESQUERDA(TA INVERTIDA LEMBRA DISSO), ficar praticamente 90 gruas
-
-        drive.moveSmooth(-46, 0.95); // ir pra tras pra linha de bolas
-        sleep(35);
-        drive.turnIMU(-90, 0.39, 6, telemetry); // girar pra linha de bolas PPG
-        sleep(35); // espera antes de andar pra ser preciso
-        drive.moveSmooth(48.5, 0.94); // andar ate  frente
-
-        intake.intake(); // INTAKEEEEEEEEEE
-        drive.moveSmoothStart(53, 0.22); // coletar
-
+        drive.moveSmoothStart(40, 0.9);
+        intake.intake();
+        drive.moveSmoothStart(30, 0.16053);
         while (opModeIsActive() && (intake.intakeIsBusy() || drive.moveSmoothIsBusy())) {
             drive.moveSmoothUpdate();   // mantém o drive andando
             intake.update();            // mantém o intake rodando
@@ -131,20 +119,13 @@ public class BlueAuto extends LinearOpMode {
         intake.stop();
         intake.update();
 
-        drive.moveSmooth(-100, 1);
-        drive.turnIMU(45, 0.7, 1, telemetry);
-        // prepara shooter para nova posição
-        filteredTarget = 0;
+        drive.moveSmoothStart(-70, 0.9162);
+        drive.turnIMU(-90, 0.32576, 1, telemetry);
+        drive.moveSmooth(-32.576, 0.9162);
+        shootar(4,0.4, 0.0, shooter, servo, alliance, shootNumber.START);
 
-        shootar(5, 0.45678901, 0, shooter, servo, Alliance.RED, shootNumber.DEPOIS);
 
-        // ENCERRA
-        drive.stop();
 
-        while (opModeIsActive()) {
-            telemetry.addData("IMU", imu.getYaw());
-            telemetry.update();
-        }
 
     }
 
@@ -160,15 +141,13 @@ public class BlueAuto extends LinearOpMode {
                     // aguarda shooter estabilizar (com timeout de segurança)
                     long timeout = System.currentTimeMillis() + 2500; // 2.5s máximo para estabilizar
                     while (opModeIsActive() && System.currentTimeMillis() < timeout) {
-                        double erro = adjustShooterPower(shooter, alliance);
-                        if (erro < STABLE_THRESHOLD) break;
+                        shooter.setPower(0.9162);
                     }
                 } else{
                     // aguarda shooter estabilizar (com timeout de segurança)
                     long timeout = System.currentTimeMillis() + 3250; // 2.15s máximo para estabilizar
                     while (opModeIsActive() && System.currentTimeMillis() < timeout) {
-                        double erro = adjustShooterPower(shooter, alliance);
-                        if (erro < STABLE_THRESHOLD) break;
+                        shooter.setPower(0.9162);
                     }
                     intake.update();
                 }
@@ -177,8 +156,7 @@ public class BlueAuto extends LinearOpMode {
                 // aguarda shooter estabilizar (com timeout de segurança)
                 long timeout = System.currentTimeMillis() + 1600; // 2s máximo para estabilizar
                 while (opModeIsActive() && System.currentTimeMillis() < timeout) {
-                    double erro = adjustShooterPower(shooter, alliance);
-                    if (erro < STABLE_THRESHOLD) break;
+                    shooter.setPower(0.9162);
                 }
             }
 

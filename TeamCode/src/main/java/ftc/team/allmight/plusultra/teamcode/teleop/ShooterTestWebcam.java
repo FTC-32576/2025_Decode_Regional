@@ -13,6 +13,7 @@
 
     import ftc.team.Java_Is_AllMight.Config.PIDConfig;
     import ftc.team.Java_Is_AllMight.Config.PIDController;
+    import ftc.team.Java_Is_AllMight.Sensors.CameraMight;
     import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
     import ftc.team.allmight.plusultra.teamcode.subsystems.Drive;
     import ftc.team.allmight.plusultra.teamcode.subsystems.IntakeSubsytem;
@@ -60,7 +61,9 @@
         private boolean servoBusy = false;
         private long lastShotTime = 0;
 
+        private int counter = 0;
 
+        private boolean allianceSelect = false;
         @Override
         public void init() {
 
@@ -82,15 +85,31 @@
 
         @Override
         public void init_loop(){
-            if(gamepad2.x){
-                alliance = Alliance.BLUE;
-            } else if(gamepad2.b){
-                alliance = Alliance.RED;
-            }
 
-            telemetry.addData("Selecionar Aliança", "X = BLUE | B = RED");
-            telemetry.addData("Aliança atual", alliance);
-            telemetry.update();
+                webcam.update();
+                List<AprilTagDetection> detections = webcam.getDetectedTagsDoNGC();
+
+                if(!allianceSelect && detections != null && !detections.isEmpty()){
+                    for (AprilTagDetection tag : detections){
+                        if (tag.id ==  Alliance.RED.getTagID()){
+                            alliance = Alliance.RED;
+                            allianceSelect = true;
+                            break;
+                        }
+                        if(tag.id == Alliance.BLUE.getTagID()){
+                            alliance = Alliance.BLUE;
+                            allianceSelect = true;
+                            break;
+                        }
+                    }
+                    if (allianceSelect) {
+                        drive.defineAlliance(alliance);
+                        telemetry.addData("Alliance", alliance);
+                        telemetry.addData("Tag", alliance.getTagID());
+                        telemetry.update();
+                    }
+                }
+
         }
 
         @Override
@@ -116,6 +135,7 @@
             // ----
             boolean webcamMode = gamepad2.right_bumper;
             double rt = gamepad2.right_trigger;
+
 
             if (webcamMode) {
 
@@ -154,12 +174,17 @@
             }
             else {
                //manual
-                shooter.setPower(Range.clip(rt, 0, 0.8375));
+                shooter.setPower(Range.clip(rt, 0, 0.95));
 
                 telemetry.addLine("MODE: MANUAL");
                 telemetry.addData("power", rt);
             }
 
+            if(gamepad2.left_bumper){
+                shooter.setPower(-1);
+            } else if(gamepad2.left_trigger > 0){
+                shooter.setPower(0);
+            }
 
             // ---------------- SERVO ----------------
             if (gamepad2.x) servo.setPosition(0.345);

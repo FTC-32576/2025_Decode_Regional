@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
 import ftc.team.allmight.plusultra.teamcode.subsystems.Drive;
 
-@Autonomous(name = "Tuning Gyro")
+//@Autonomous(name = "Tuning Gyro")
 public class TuningGyro extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

@@ -61,6 +61,8 @@
             DEPOIS()
         }
 
+        Alliance alliance = null;
+        boolean allianceSelect = false;
 
         @Override
         public void runOpMode() throws InterruptedException {
@@ -83,7 +85,7 @@
 
             // DRIVE
             Drive drive = new Drive(hardwareMap, imu);
-            drive.defineAlliance(Alliance.RED);
+
 
             telemetry.addLine("Pronto");
             telemetry.update();
@@ -100,30 +102,54 @@
             filteredTarget = preBoost;  // Começa o filtro daqui
 
 
+            drive.moveSmoothStart(-135, 1); // ir pra ponta do triangulo grande
 
+            while(drive.moveSmoothIsBusy() && opModeIsActive()){
+                drive.moveSmoothUpdate();
+                cameraMight.update();
+                List<AprilTagDetection> detections = cameraMight.getDetectedTagsDoNGC();
 
-    //        for (int i = 0; i < 10 && opModeIsActive(); i++) {
-    //            double erro = adjustShooterPower(shooter, Alliance.RED);
-    //            if (erro < STABLE_THRESHOLD) break;
-    //        }
+                if(!allianceSelect && detections != null && !detections.isEmpty()){
+                    for (AprilTagDetection tag : detections){
+                        if (tag.id ==  Alliance.RED.getTagID()){
+                            alliance = Alliance.RED;
+                            allianceSelect = true;
+                            break;
+                        }
+                        if(tag.id == Alliance.BLUE.getTagID()){
+                            alliance = Alliance.BLUE;
+                            allianceSelect = true;
+                            break;
+                        }
+                    }
+                    if (allianceSelect) {
+                        drive.defineAlliance(alliance);
+                        telemetry.addData("Alliance", alliance);
+                        telemetry.addData("Tag", alliance.getTagID());
+                        telemetry.update();
+                    }
+                }
 
+            }
 
+            shootar(4, 0.45678901, 0, shooter, servo, alliance, shootNumber.START); // shootar 3 bolas + 1 por segurança
 
-            drive.moveSmooth(-135, 1); // ir pra ponta do triangulo grande
+            if(alliance == Alliance.RED){
+                drive.turnIMU(50, 0.35, 1, telemetry); // girar pra ESQUERDA(TA INVERTIDA LEMBRA DISSO), ficar praticamente 90 gruas
 
-
-            shootar(5, 0.45678901, 0, shooter, servo, Alliance.RED, shootNumber.START); // shootar 3 bolas + 1 por segurança
-
-            drive.turnIMU(50, 0.35, 1, telemetry); // girar pra ESQUERDA(TA INVERTIDA LEMBRA DISSO), ficar praticamente 90 gruas
-
-            drive.moveSmooth(-46, 0.95); // ir pra tras pra linha de bolas
-            sleep(35);
-            drive.turnIMU(-90, 0.39, 6, telemetry); // girar pra linha de bolas PPG
-            sleep(35); // espera antes de andar pra ser preciso
-            drive.moveSmooth(48.5, 0.94); // andar ate  frente
+                drive.moveSmooth(-46, 0.95); // ir pra tras pra linha de bolas
+                sleep(35);
+                drive.turnIMU(-90, 0.39, 6, telemetry); // girar pra linha de bolas PPG
+                sleep(35); // espera antes de andar pra ser preciso
+                drive.moveSmooth(48.5, 0.94);
+            } else{
+                drive.moveSmooth(-15, 0.6);
+                drive.turnIMU(-40, 0.32576, 1, telemetry);
+                drive.moveSmooth(49.5, 0.94);
+            }
 
             intake.intake(); // INTAKEEEEEEEEEE
-            drive.moveSmoothStart(53, 0.22); // coletar
+            drive.moveSmoothStart(58, 0.22); // coletar
 
             while (opModeIsActive() && (intake.intakeIsBusy() || drive.moveSmoothIsBusy())) {
                 drive.moveSmoothUpdate();   // mantém o drive andando
@@ -135,11 +161,16 @@
             intake.update();
 
             drive.moveSmooth(-100, 1);
-            drive.turnIMU(45, 0.7, 1, telemetry);
+            if(alliance == Alliance.RED){
+                drive.turnIMU(45, 0.7, 1, telemetry);
+            } else{
+                drive.turnIMU(32, 0.7, 1, telemetry);
+            }
+
             // prepara shooter para nova posição
             filteredTarget = 0;
 
-            shootar(5, 0.45678901, 0, shooter, servo, Alliance.RED, shootNumber.DEPOIS);
+            shootar(5, 0.45678901, 0, shooter, servo, alliance, shootNumber.DEPOIS);
 
             // ENCERRA
             drive.stop();

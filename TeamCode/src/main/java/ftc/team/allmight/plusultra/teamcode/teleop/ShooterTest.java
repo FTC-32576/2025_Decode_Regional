@@ -16,7 +16,6 @@ import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.Java_Is_AllMight.Config.PIDController;
 import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
 import ftc.team.Java_Is_AllMight.Utils.RoboUtils;
-import ftc.team.allmight.plusultra.teamcode.roadrunner.drive.SampleTankDrive;
 import ftc.team.allmight.plusultra.teamcode.subsystems.Drive;
 import ftc.team.allmight.plusultra.teamcode.subsystems.DriveAcel;
 import ftc.team.allmight.plusultra.teamcode.subsystems.IntakeSubsytem;
@@ -33,7 +32,6 @@ public class ShooterTest extends OpMode {
     private ServoSubsystem servo;
     private DriveAcel drive;
 
-    private SampleTankDrive odometryTank;
 
     private static final double TICKS_PER_REV = 28.0;
     private static final double GEARS = 25.0 / 20.0;
@@ -63,7 +61,6 @@ public class ShooterTest extends OpMode {
         drive = new DriveAcel(hardwareMap);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        odometryTank = new SampleTankDrive(hardwareMap);
     }
 
     @Override

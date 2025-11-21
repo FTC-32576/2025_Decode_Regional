@@ -7,7 +7,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import ftc.team.Java_Is_AllMight.Sensors.CameraMight;
 
-@TeleOp(name = "Teste da Webcam")
+//@TeleOp(name = "Teste da Webcam")
 public class AprilTagExample extends OpMode {
 
     CameraMight cameraMight = new CameraMight();
