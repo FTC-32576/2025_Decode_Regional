@@ -26,7 +26,7 @@
     import ftc.team.allmight.plusultra.teamcode.subsystems.ServoSubsystem;
     import ftc.team.allmight.plusultra.teamcode.utils.AprilTagPatternUtil;
 
-    @Autonomous(name = "AUTO - PERTO Simples", group = "A")
+    @Autonomous(name = "UNICO AUTONOMO", group = "A")
     public class RedAutoPerto extends LinearOpMode {
 
         private AprilTagPatternUtil patternUtil;
@@ -49,7 +49,7 @@
 
         // Regressão distância → velocidade alvo
         private static final double M = 380.8306010928962;
-        private static final double B = 554.551912568306;
+        private static final double B = 559.851912568306;
         private static final double ALPHA = 0.25;
         private double filteredTarget = 0;
 
@@ -135,21 +135,21 @@
             shootar(4, 0.45678901, 0, shooter, servo, alliance, shootNumber.START); // shootar 3 bolas + 1 por segurança
 
             if(alliance == Alliance.RED){
-                drive.turnIMU(50, 0.35, 1, telemetry); // girar pra ESQUERDA(TA INVERTIDA LEMBRA DISSO), ficar praticamente 90 gruas
+//                drive.turnIMU(50, 0.35, 1, telemetry); // girar pra ESQUERDA(TA INVERTIDA LEMBRA DISSO), ficar praticamente 90 gruas
 
-                drive.moveSmooth(-46, 0.95); // ir pra tras pra linha de bolas
+                drive.moveSmooth(-35, 0.95); // ir pra tras pra linha de bolas
                 sleep(35);
-                drive.turnIMU(-90, 0.39, 6, telemetry); // girar pra linha de bolas PPG
+                drive.turnIMU(-40, 0.39, 6, telemetry); // girar pra linha de bolas PPG
                 sleep(35); // espera antes de andar pra ser preciso
-                drive.moveSmooth(48.5, 0.94);
+                drive.moveSmooth(68, 0.96);
             } else{
-                drive.moveSmooth(-15, 0.6);
+                drive.moveSmooth(-20, 0.6);
                 drive.turnIMU(-40, 0.32576, 1, telemetry);
-                drive.moveSmooth(49.5, 0.94);
+                drive.moveSmooth(58, 1);
             }
 
             intake.intake(); // INTAKEEEEEEEEEE
-            drive.moveSmoothStart(58, 0.22); // coletar
+            drive.moveSmoothStart(83, 0.22); // coletar
 
             while (opModeIsActive() && (intake.intakeIsBusy() || drive.moveSmoothIsBusy())) {
                 drive.moveSmoothUpdate();   // mantém o drive andando
@@ -159,21 +159,6 @@
             drive.stop();
             intake.stop();
             intake.update();
-
-            drive.moveSmooth(-100, 1);
-            if(alliance == Alliance.RED){
-                drive.turnIMU(45, 0.7, 1, telemetry);
-            } else{
-                drive.turnIMU(32, 0.7, 1, telemetry);
-            }
-
-            // prepara shooter para nova posição
-            filteredTarget = 0;
-
-            shootar(5, 0.45678901, 0, shooter, servo, alliance, shootNumber.DEPOIS);
-
-            // ENCERRA
-            drive.stop();
 
             while (opModeIsActive()) {
                 telemetry.addData("IMU", imu.getYaw());
@@ -192,7 +177,7 @@
                 if (i == 0){
                     if (shoot == shoot.START){
                         // aguarda shooter estabilizar (com timeout de segurança)
-                        long timeout = System.currentTimeMillis() + 2500; // 2.5s máximo para estabilizar
+                        long timeout = System.currentTimeMillis() + 2680; // 2.5s máximo para estabilizar
                         while (opModeIsActive() && System.currentTimeMillis() < timeout) {
                             double erro = adjustShooterPower(shooter, alliance);
                             if (erro < STABLE_THRESHOLD) break;

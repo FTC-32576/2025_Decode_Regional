@@ -23,8 +23,8 @@ import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
 import ftc.team.allmight.plusultra.teamcode.subsystems.IntakeSubsytem;
 import ftc.team.allmight.plusultra.teamcode.utils.AprilTagPatternUtil;
 
-@Autonomous(name = "VERMELHO - LONGE Simples", group = "A")
-public class BlueAuto extends LinearOpMode {
+@Autonomous(name = "Blue - LONGE Simples", group = "A")
+public class blueAutoLonge extends LinearOpMode {
 
     private AprilTagPatternUtil patternUtil;
     private AprilTagProcessor aprilTag;
@@ -56,7 +56,8 @@ public class BlueAuto extends LinearOpMode {
     private Alliance alliance = Alliance.BLUE;
     public enum shootNumber{
         START(),
-        DEPOIS()
+        DEPOIS(),
+        LONGE()
     }
 
 
@@ -98,10 +99,10 @@ public class BlueAuto extends LinearOpMode {
         shooter.setPower(preBoost);
         filteredTarget = preBoost;  // Começa o filtro daqui
 
-        drive.moveSmooth(32.576, 0.6);
-        drive.turnIMU(32.576, 0.32576, 1, telemetry);
+        drive.moveSmooth(28.5, 0.6);
+        drive.turnIMU(-27.576, 0.32576, 1, telemetry);
 
-        shootar(4,0.4, 0.0, shooter, servo, alliance, shootNumber.START);
+        shootar(4,0.4, 0.0, shooter, servo, alliance, shootNumber.LONGE);
 
         drive.turnIMU(-32.576, 0.32576, 1, telemetry);
         drive.moveSmooth(32.576, 0.9162);
@@ -143,14 +144,30 @@ public class BlueAuto extends LinearOpMode {
                     while (opModeIsActive() && System.currentTimeMillis() < timeout) {
                         shooter.setPower(0.9162);
                     }
-                } else{
-                    // aguarda shooter estabilizar (com timeout de segurança)
-                    long timeout = System.currentTimeMillis() + 3250; // 2.15s máximo para estabilizar
+
+                } else if(shoot == shoot.LONGE) {
+                    long timeout = System.currentTimeMillis() + 3000; // 2.5s máximo para estabilizar
                     while (opModeIsActive() && System.currentTimeMillis() < timeout) {
-                        shooter.setPower(0.9162);
+                        shooter.setPower(0.84);
+                        intake.update();
                     }
-                    intake.update();
                 }
+                else {
+                        if(shoot == shootNumber.START){
+                            long timeout = System.currentTimeMillis() + 2050; // 2.15s máximo para estabilizar
+                            while (opModeIsActive() && System.currentTimeMillis() < timeout) {
+                                shooter.setPower(0.9162);
+                            }
+                            intake.update();
+                        }else{
+                            long timeout = System.currentTimeMillis() + 3250; // 2.15s máximo para estabilizar
+                            while (opModeIsActive() && System.currentTimeMillis() < timeout) {
+                                shooter.setPower(0.9162);
+                            }
+                            intake.update();
+                        }
+
+                    }
 
             } else{
                 // aguarda shooter estabilizar (com timeout de segurança)

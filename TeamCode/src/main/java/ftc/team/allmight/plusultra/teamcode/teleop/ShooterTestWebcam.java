@@ -21,7 +21,7 @@
     import ftc.team.Java_Is_AllMight.Sensors.CameraMight;
     import ftc.team.Java_Is_AllMight.Utils.Alliance;
 
-    @TeleOp(name = "ShooterTest Webcam PID REAL FINAL")
+    @TeleOp(name = "Teleoperado VERMELHO")
     public class ShooterTestWebcam extends OpMode {
 
         private DcMotorEx shooter;
@@ -86,34 +86,14 @@
         @Override
         public void init_loop(){
 
-                webcam.update();
-                List<AprilTagDetection> detections = webcam.getDetectedTagsDoNGC();
 
-                if(!allianceSelect && detections != null && !detections.isEmpty()){
-                    for (AprilTagDetection tag : detections){
-                        if (tag.id ==  Alliance.RED.getTagID()){
-                            alliance = Alliance.RED;
-                            allianceSelect = true;
-                            break;
-                        }
-                        if(tag.id == Alliance.BLUE.getTagID()){
-                            alliance = Alliance.BLUE;
-                            allianceSelect = true;
-                            break;
-                        }
-                    }
-                    if (allianceSelect) {
-                        drive.defineAlliance(alliance);
-                        telemetry.addData("Alliance", alliance);
-                        telemetry.addData("Tag", alliance.getTagID());
-                        telemetry.update();
-                    }
-                }
-
-        }
-
+                telemetry.addData("Aliança", alliance);
+                telemetry.update();
+}
         @Override
         public void loop() {
+
+
 
             // ---------------- STOP ----------------
             if (gamepad2.back) {
@@ -174,7 +154,7 @@
             }
             else {
                //manual
-                shooter.setPower(Range.clip(rt, 0, 0.95));
+                shooter.setPower(Range.clip(rt, 0, 0.7868));
 
                 telemetry.addLine("MODE: MANUAL");
                 telemetry.addData("power", rt);

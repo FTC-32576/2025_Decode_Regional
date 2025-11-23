@@ -1,144 +1,187 @@
 package ftc.team.allmight.plusultra.teamcode.teleop;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.List;
 
 import ftc.team.Java_Is_AllMight.Config.PIDConfig;
 import ftc.team.Java_Is_AllMight.Config.PIDController;
-import ftc.team.Java_Is_AllMight.Logging.ChassisSpeed;
-import ftc.team.Java_Is_AllMight.Utils.RoboUtils;
+import ftc.team.Java_Is_AllMight.Sensors.CameraMight;
+import ftc.team.Java_Is_AllMight.Sensors.IMUMight;
 import ftc.team.allmight.plusultra.teamcode.subsystems.Drive;
-import ftc.team.allmight.plusultra.teamcode.subsystems.DriveAcel;
 import ftc.team.allmight.plusultra.teamcode.subsystems.IntakeSubsytem;
 import ftc.team.allmight.plusultra.teamcode.subsystems.ServoSubsystem;
-import ftc.team.allmight.plusultra.teamcode.subsystems.ShooterSubsystem;
+import ftc.team.Java_Is_AllMight.Sensors.CameraMight;
+import ftc.team.Java_Is_AllMight.Utils.Alliance;
 
-@TeleOp(name = "Subsystem Teste REAL")
+@TeleOp(name = "Teleoperado AZUL")
 public class ShooterTest extends OpMode {
 
-//    private ShooterSubsystem shooter;
     private DcMotorEx shooter;
-
     private IntakeSubsytem intake;
     private ServoSubsystem servo;
-    private DriveAcel drive;
+    private Drive drive;
 
+    private CameraMight webcam;
+    private Alliance alliance = Alliance.BLUE;
 
-    private static final double TICKS_PER_REV = 28.0;
-    private static final double GEARS = 25.0 / 20.0;
-
-
+    // ===== PID =====
     private PIDConfig pidShooterSettings = new PIDConfig(
-//            0.0008,
-//            0.00002,
-//            0.0001
-            0.000765,  // P
-            0.00000,       // I
-            0.000000     // D
+            0.00435,  // P
+            0.0,       // I
+            0.0        // D
     );
-
     private PIDController pidShooter = new PIDController(pidShooterSettings);
 
-    private static final double potenciaAlvo = 900;
+    // ===== LINEAR =====
+    private static final double M = 380.8306010928962;
+    private static final double B = 554.551912568306;
+    private double filteredTarget = 0.0;
+    private static final double ALPHA = 0.25;
 
+    // LIMITES
+    private static final double TARGET_MIN = 0;
+    private static final double TARGET_MAX = 2000;
+
+    // Shooter estado
+    private boolean shooterOn = false;
+
+    // ===== AUTO SHOOT =====
+    private static final int TOLERANCIA = 20;
+    private static final int STABLE_REQUIRED = 4;
+
+    private int stableCounter = 0;
+    private boolean servoBusy = false;
+    private long lastShotTime = 0;
+
+    private int counter = 0;
+
+    private boolean allianceSelect = false;
     @Override
     public void init() {
-//        shooter = new ShooterSubsystem();
-//        shooter.init(hardwareMap);
 
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        intake = new IntakeSubsytem(hardwareMap, telemetry);
-        servo = new ServoSubsystem(hardwareMap);
-        drive = new DriveAcel(hardwareMap);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        intake = new IntakeSubsytem(hardwareMap, telemetry);
+        servo = new ServoSubsystem(hardwareMap);
+        drive = new Drive(hardwareMap, new IMUMight(hardwareMap, "imu", RevHubOrientationOnRobot.UsbFacingDirection.UP, RevHubOrientationOnRobot.LogoFacingDirection.RIGHT));
+
+        webcam = new CameraMight();
+        webcam.init(hardwareMap, telemetry);
+
+        telemetry.addLine("iniciado!");
+    }
+
+
+
+    @Override
+    public void init_loop(){
+
+        telemetry.addData("Aliança", alliance);
+        telemetry.update();
+
     }
 
     @Override
     public void loop() {
 
-//        odometryTank.update();
 
 
-        // Atualiza shooter
-//        shooter.update(telemetry);
+        // ---------------- STOP ----------------
+        if (gamepad2.back) {
+            intake.stop();
+            shooter.setPower(0);
+            servo.setPosition(0.0);
+        }
+        else {
 
-        // INTake
-        if (gamepad2.right_trigger > 0.1) intake.intake();
-        else if (gamepad2.left_trigger > 0.1) intake.reverse();
-        else intake.stop();
+
+            if (gamepad2.a) intake.intake();
+            else if (gamepad2.b) intake.reverse();
+            else intake.stop();
+        }
 
         intake.update();
 
-        // Shooter Power / Start / Stop
-//        if (gamepad2.right_bumper) {
-//            double targetRpm = 3200;          // RPM desejado da saída
-//            double targetRpmMotor  = targetRpm / GEARS;  // RPM no motor
-//
-//            double ticksPerSecond = rpmToTicksPerSecond(targetRpmMotor);
-//            shooter.getVelocity();
-//            shooter.setPower(0.2548);
-//            pidShooter.calculate(setpoint,measurement);
-////            shooter.setVelocity(ticksPerSecond);
-//        }
-//        if (gamepad2.left_bumper) shooter.setVelocity(0);
+        // ---------------- SHOOTER ------------
+        // ----
+        boolean webcamMode = gamepad2.right_bumper;
+        double rt = gamepad2.right_trigger;
 
-        if (gamepad2.right_bumper) {
 
-            double velocidadeAtual = shooter.getVelocity();   // ticks/seg atual
-            double velocidadeAlvo = potenciaAlvo;             // já veio como 660 (ticks/s)
+        if (webcamMode) {
 
-            double erro = velocidadeAlvo - velocidadeAtual;
+            // ======= WEBCAM + PID =======
+            List<AprilTagDetection> detections = webcam.aprilTagProcessorDosNgc.getDetections();
+            AprilTagDetection tag = findAllianceTag(detections, alliance.getTagID());
 
-            double pidOutput = pidShooter.calculate(velocidadeAlvo, velocidadeAtual);
+            if (tag != null) {
 
-            // Ajuste final de potência
-            double potencia = Range.clip(pidOutput, -1, 1);
+                double distancia = tag.ftcPose.range;
 
-            shooter.setPower(potencia);
+                // regressão
+                double targetTicks = M * distancia + B;
+                targetTicks = Range.clip(targetTicks, TARGET_MIN, TARGET_MAX);
 
-//            telemetry.addData("PID Output", pidOutput);
-//            telemetry.addData("Erro", erro);
-//            telemetry.addData("Potência final", potencia);
+                // filtro
+                if (filteredTarget == 0) filteredTarget = targetTicks;
+                else filteredTarget = ALPHA * targetTicks + (1 - ALPHA) * filteredTarget;
+
+                // PID
+                double atual = shooter.getVelocity();
+                double pidOut = pidShooter.calculate(filteredTarget, atual);
+                double power = Range.clip(pidOut, -1, 1);
+
+                shooter.setPower(power);
+
+                telemetry.addLine("MODE: WEBCAM");
+                telemetry.addData("dist", distancia);
+                telemetry.addData("target", filteredTarget);
+                telemetry.addData("vel atual", atual);
+            }
+            else {
+                shooter.setPower(0);
+                telemetry.addLine("WEBCAM MODE - NO TAG");
+            }
+        }
+        else {
+            //manual
+            shooter.setPower(Range.clip(rt, 0, 0.7868));
+
+            telemetry.addLine("MODE: MANUAL");
+            telemetry.addData("power", rt);
         }
 
-        if (gamepad2.left_bumper) {
+        if(gamepad2.left_bumper){
+            shooter.setPower(-1);
+        } else if(gamepad2.left_trigger > 0){
             shooter.setPower(0);
         }
 
-        // Servo -> posições fixas
-        if (gamepad2.x) {
-            servo.setPosition(0.345); // disparar
-        } else if(gamepad2.y){
-            servo.setPosition(0.0);   // fechado
-        }
+        // ---------------- SERVO ----------------
+        if (gamepad2.x) servo.setPosition(0.345);
+        if (gamepad2.y) servo.setPosition(0.0);
 
-
-
-        // Drive
-        drive.drive(
-                -gamepad1.left_stick_y,
-                gamepad1.right_stick_x,
-                gamepad1.right_stick_y
-        );
-
-
-        telemetry.addData("Servo Pos", servo.getPosition());
-        telemetry.addData("Velocidade do Shooter", shooter.getVelocity());
+        // ---------------- DRIVE ----------------
+        drive.drive(-gamepad1.left_stick_y, gamepad1.right_stick_x);
 
         telemetry.update();
     }
 
-    public double rpmToTicksPerSecond(double rpm) {
-        return (rpm / 60.0) * TICKS_PER_REV;
+    private AprilTagDetection findAllianceTag(List<AprilTagDetection> detections, int tagId) {
+        if (detections == null) return null;
+        for (AprilTagDetection t : detections) {
+            if (t.id == tagId) return t;
+        }
+        return null;
     }
 }
